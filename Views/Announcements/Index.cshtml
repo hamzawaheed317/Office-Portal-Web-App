@@ -1,0 +1,303 @@
+﻿@model IEnumerable<OfficePortal.Models.Announcement>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <!-- CSS Styles -->
+    <style>
+        .add-announcement-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .announcements-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .announcement-card {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .announcement-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .author-name {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .posted-date {
+            color: #777;
+        }
+
+        .announcement-content {
+            position: relative;
+            width: 100%;
+            max-width: 700px; /* Universal width for image and video */
+            margin: 0 auto;
+        }
+
+            .announcement-content h5 {
+                font-size: 18px;
+                margin-top: 10px;
+            }
+
+        .announcement-image,
+        .announcement-video {
+            width: 100%; /* Adjust to full width of the container */
+            max-height: 400px; /* Universal height */
+            object-fit: cover; /* Ensures the image or video maintains aspect ratio */
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .announcement-footer {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .like-comment {
+            display: flex;
+            align-items: center;
+        }
+
+        .like-count {
+            margin-right: 20px;
+        }
+
+        .add-comment {
+            display: flex;
+            flex: 1;
+        }
+
+        .comment-input {
+            width: 100%;
+            margin-right: 10px;
+        }
+
+        .comments-section {
+            margin-top: 15px;
+        }
+
+        .heart-icon {
+            font-size: 20px;
+            cursor: pointer;
+            color: #e74c3c; /* Red color */
+            margin-right: 10px;
+        }
+
+            .heart-icon.liked {
+                color: #c0392b; /* Darker red for liked state */
+            }
+    </style>
+</head>
+<body>
+    <!-- Add Announcement Button -->
+    <div class="add-announcement-container">
+        <button id="addAnnouncementBtn" class="btn btn-success">Add Announcement</button>
+    </div>
+
+    <!-- Announcements Container -->
+    <div class="announcements-container">
+        @foreach (var item in Model)
+
+
+
+        {
+            <div class="announcement-card">
+                <div class="announcement-header">
+                    <div class="author-info">
+                        <img src="~/images/default-profile.png" alt="Profile" class="author-profile" /> <!-- Default profile image -->
+                        <span class="author-name">@item.Author</span>
+                        <span class="posted-date">@item.PostedDate.ToString("MMMM dd HH:mm")</span>
+                    </div>
+                    <div class="announcement-content">
+                        <p>@item.Content</p>
+                        <!-- Show Image or Video -->
+                        @if (!string.IsNullOrEmpty(item.FileUrl))
+
+
+
+                        {
+                            if (item.FileUrl.EndsWith(".jpg") || item.FileUrl.EndsWith(".jpeg") || item.FileUrl.EndsWith(".png"))
+                            {
+                                <img src="@Url.Content("~/uploads/" + item.FileUrl)" alt="Announcement Image" class="announcement-image" />
+                            }
+                            else if (item.FileUrl.EndsWith(".mp4"))
+                            {
+                                <video controls class="announcement-video">
+                                    <source src="@Url.Content("~/uploads/" + item.FileUrl)" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            }
+
+
+
+                        }
+                    </div>
+                </div>
+
+                <!-- Like and Comment Section -->
+                <div class="announcement-footer">
+                    <div class="like-comment">
+                        <span class="like-count">@item.LikesCount Likes</span>
+                        <a href="#" class="like-btn" data-announcement-id="@item.Id" data-likes-count="@item.LikesCount">
+                            <i class="heart-icon">&#9829;</i> <!-- Heart icon -->
+                        </a>
+                        <a href="#" class="view-comments" data-announcement-id="@item.Id">View all comments</a>
+                    </div>
+                    <div class="add-comment">
+                        <input type="text" class="form-control comment-input" placeholder="Add Comment" data-announcement-id="@item.Id" />
+                        <button class="btn btn-primary post-comment-btn" data-announcement-id="@item.Id">Post</button>
+                    </div>
+                </div>
+
+                <!-- Comments Section (Hidden by default, can be toggled) -->
+                <div class="comments-section" id="comments-@item.Id" style="display: none;">
+                    @* Dynamically load comments via Ajax *@
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- jQuery Script -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Show/hide comments section
+
+
+            // Post a comment
+
+
+            // // Like an announcement
+            // $(document).on('click', '.like-btn', function (e) {
+            //     e.preventDefault();
+            //     const announcementId = $(this).data('announcement-id');
+            //     const currentLikesCount = $(this).data('likes-count');
+
+            //     var LikeUrl = '@Url.Action("Like", "Announcements")';
+            //     $.post(LikeUrl /* '/Announcements/Like' */, { announcementId: announcementId }, (response) => {
+            //         if (response.success) {
+            //             // Update the likes count and toggle liked class
+            //             const newLikesCount = currentLikesCount + 1; // Increment likes count
+            //             $(this).data('likes-count', newLikesCount);
+            //             $(this).closest('.like-comment').find('.like-count').text(newLikesCount + ' Likes');
+            //             $(this).find('.heart-icon').addClass('liked'); // Change heart color
+            //         } else {
+            //             // Handle failure
+            //             alert(response.message); // Show error message
+            //         }
+            //     }).fail(function (jqXHR, textStatus, errorThrown) {
+            //         console.error("Error liking announcement: " + textStatus, errorThrown);
+            //     });
+            // });
+
+            $('.post-comment-btn').on('click', function () {
+                const announcementId = $(this).data('announcement-id');
+                const commentInput = $(this).closest('.add-comment').find('.comment-input');
+                const commentText = commentInput.val().trim();
+                const author = 'hw'; // Set author name to "hw"
+
+                // Check if comment text is empty
+                if (commentText === '') return;
+
+                Comment = {};
+                Comment.AnnouncementId = announcementId;
+                Comment.Content = commentText;
+                Comment.Author = author;
+
+                var CreateUrl = '@Url.Action("Create", "Comments")';
+                $.ajax({
+                    type: "POST",
+                    url: CreateUrl /*  "/Comments/Create" */,
+                    data: JSON.stringify(Comment),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    async: false,
+                    cache: false,
+
+                    success: function (response) {
+                        if (response.success) {
+                            // Show success message
+                            alert(response.message); // Use the message from the response
+                        } else {
+                            // Handle failure
+                            alert(response.message); // Show the error message
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("Error posting comment: " + textStatus, errorThrown);
+                    }
+                });
+                // $.post(CreateUrl /* '/Comments/Create' */, {
+                //     announcementId: announcementId,
+                //     content: commentText,
+                //     author: author
+                // }, function (response) {
+                //     if (response.success) {
+                //         // Show success message
+                //         alert(response.message); // Use the message from the response
+                //     } else {
+                //         // Handle failure
+                //         alert(response.message); // Show the error message
+                //     }
+                // }).fail(function (jqXHR, textStatus, errorThrown) {
+                //     console.error("Error posting comment: " + textStatus, errorThrown);
+                // });
+            });
+
+            $(".view-comments").on('click', '.view-comments', function (e) {
+                e.preventDefault();
+                const announcementId = $(this).data('announcement-id');
+                const commentsSection = $('#comments-' + announcementId);
+
+                commentsSection.toggle();
+
+                if (commentsSection.is(':visible')) {
+                    // Load comments via Ajax
+                    var GetCommentsUrl = '@Url.Action("GetComments", "Announcements")';
+                    $.get(GetCommentsUrl /* '/Announcements/GetComments' */, { announcementId: announcementId }, function (data) {
+                        commentsSection.html(data);
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        console.error("Error loading comments: " + textStatus, errorThrown);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

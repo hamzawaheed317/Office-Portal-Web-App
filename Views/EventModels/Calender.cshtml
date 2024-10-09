@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* Customize calendar colors */
+        .fc-event {
+            background-color: #007bff; /* Blue */
+            border-color: #007bff; /* Blue */
+            color: white; /* White text */
+        }
+        .loader {
+            display: none; /* Hidden by default */
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%; /* Circular */
+            width: 40px; /* Width of the loader */
+            height: 40px; /* Height of the loader */
+            animation: spin 1s linear infinite; /* Spinning animation */
+            margin: 10px; /* Margin around the loader */
+        }
+        
+        .modal-lg {
+            max-width: 800px; /* Increase modal width */
+        }
+        .btn-group {
+            margin-bottom: 10px; /* Margin between buttons */
+        }
+        .create-event-btn {
+            margin-left: 10px; /* Space between filter buttons and Create Event button */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>FullCalendar with Events</h1>
+
+        <!-- View Buttons for Day, Week, Month and Create Event Button -->
+        <div class="btn-group mb-3">
+            <button id="btnDay" class="btn btn-secondary">Day</button>
+            <button id="btnWeek" class="btn btn-secondary">Week</button>
+            <button id="btnMonth" class="btn btn-secondary">Month</button>
+            <button type="button" class="btn btn-primary create-event-btn" data-toggle="modal" data-target="#createEventModal">
+                Create Event
+            </button>
+        </div>
+
+        <!-- Loader -->
+        <div class="loader" id="loader"></div>
+
+        <div id="calendar"></div>
+
+        <!-- Create Event Modal -->
+        <div class="modal fade" id="createEventModal" tabindex="-1" role="dialog" aria-labelledby="createEventModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document"> <!-- Increased modal width -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createEventModalLabel">Create Event</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @await Html.PartialAsync("_CreateEvent", new OfficePortal.Models.EventModel())
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var calendarEl = document.getElementById('calendar');
+                var loader = document.getElementById('loader');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    editable: true,
+                    selectable: true,
+
+                    // Fetch events from the controller
+                    events: function (fetchInfo, successCallback, failureCallback) {
+                        loader.style.display = 'block'; // Show loader
+                        $.ajax({
+                            url: '@Url.Action("GetEvents", "EventModels")', // Ensure this matches your routing
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+                                successCallback(data); // Pass the events to FullCalendar
+                                loader.style.display = 'none'; // Hide loader after fetching
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching events:", error);
+                                failureCallback(error); // Handle the error
+                                loader.style.display = 'none'; // Hide loader on error
+                            }
+                        });
+                    },
+
+                    // Handle event creation via modal
+                    dateClick: function (info) {
+                        $('#startDate').val(info.dateStr);
+                        $('#endDate').val(info.dateStr);
+                        $('#createEventModal').modal('show');
+                    }
+                });
+
+                calendar.render();
+
+               
+
+                // Button click events to switch views
+                $('#btnDay').on('click', function() {
+                    calendar.changeView('timeGridDay'); // Change to day view
+                });
+
+                $('#btnWeek').on('click', function() {
+                    calendar.changeView('timeGridWeek'); // Change to week view
+                });
+
+                $('#btnMonth').on('click', function() {
+                    calendar.changeView('dayGridMonth'); // Change to month view
+                });
+            });
+        </script>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements and Initiatives</title>
+
+    <!-- Embedded CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background-color: #333;
+            color: #fff;
+            padding: 1em;
+            text-align: center;
+        }
+
+            nav ul {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            nav a {
+                color: #fff;
+                text-decoration: none;
+                transition: color 0.2s ease;
+            }
+
+                nav a:hover {
+                    color: #ccc;
+                }
+
+            nav li {
+                margin-right: 20px;
+            }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 2em;
+        }
+
+        .announcements, .initiative, .comments {
+            background-color: #f7f7f7;
+            padding: 1em;
+            margin: 10px;
+            width: 300px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#" class="active">Announcements</a></li>
+            <li><a href="#">Initiative</a></li>
+            <li><a href="#">Forms Request</a></li>
+            <li><a href="#">Comments Request</a></li>
+        </ul>
+    </nav>
+
+    <div class="content">
+        <!-- Announcements Section -->
+        <div class="announcements">
+            <h2>Announcements</h2>
+            <button>New Announcement</button>
+            <ul>
+                <!-- List of announcements will be populated here -->
+            </ul>
+        </div>
+
+        <!-- Initiative Section -->
+        <div class="initiative">
+            <h2>Initiative</h2>
+            <div class="initiative-detail">
+                <!-- Initiative details will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments">
+            <h2>Comments</h2>
+            <ul>
+                <!-- List of comments will be populated here -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Embedded jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Embedded JavaScript -->
+    <script>
+        $(document).ready(function () {
+            // Example data for announcements and comments
+            var announcementsData = [
+                { title: 'Announcement 1', description: 'This is the first announcement' },
+                { title: 'Announcement 2', description: 'This is the second announcement' },
+            ];
+
+            var commentsData = [
+                { text: 'This is the first comment' },
+                { text: 'This is the second comment' },
+            ];
+
+            // Populate announcements section
+            $.each(announcementsData, function (index, announcement) {
+                $('.announcements ul').append('<li><h3>' + announcement.title + '</h3><p>' + announcement.description + '</p></li>');
+            });
+
+            // Populate comments section
+            $.each(commentsData, function (index, comment) {
+                $('.comments ul').append('<li><p>' + comment.text + '</p></li>');
+            });
+        });
+    </script>
+</body>
+</html>

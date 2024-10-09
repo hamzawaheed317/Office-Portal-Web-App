@@ -1,0 +1,148 @@
+﻿@model OfficePortal.Models.EventModel
+@inject OfficePortal.Services.LanguageService _localization // Injecting the localization service
+
+@{
+    ViewData["Title"] = "Create Event";
+}
+
+<div>
+    <form id="createEventForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Title" class="control-label">@_localization.Getkey("TitleLabel")</label>
+            <input asp-for="Title" class="form-control" required />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StartDate" class="control-label">@_localization.Getkey("StartDateLabel")</label>
+            <input asp-for="StartDate" type="datetime-local" class="form-control" required />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="EndDate" class="control-label">@_localization.Getkey("EndDateLabel")</label>
+            <input asp-for="EndDate" type="datetime-local" class="form-control" required />
+            <span asp-validation-for="EndDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Repeat" class="control-label">@_localization.Getkey("RepeatLabel")</label>
+            <select asp-for="Repeat" class="form-control" required>
+                <option value="">@_localization.Getkey("SelectRepeat")</option>
+                <option value="dont repeat">@_localization.Getkey("DontRepeat")</option>
+                <option value="daily">@_localization.Getkey("Daily")</option>
+                <option value="weekly">@_localization.Getkey("Weekly")</option>
+                <option value="monthly">@_localization.Getkey("Monthly")</option>
+                <option value="yearly">@_localization.Getkey("Yearly")</option>
+            </select>
+            <span asp-validation-for="Repeat" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Location" class="control-label">@_localization.Getkey("LocationLabel")</label>
+            <input asp-for="Location" class="form-control" required />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Attendees" class="control-label">@_localization.Getkey("AttendeesLabel")</label>
+            <input asp-for="Attendees" class="form-control" required />
+            <span asp-validation-for="Attendees" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description" class="control-label">@_localization.Getkey("DescriptionLabel")</label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Reminder" class="control-label">@_localization.Getkey("ReminderLabel")</label>
+            <select asp-for="Reminder" class="form-control" required>
+                <option value="">@_localization.Getkey("SelectReminder")</option>
+                <option value="when the event starts">@_localization.Getkey("WhenEventStarts")</option>
+                <option value="5 minutes before">@_localization.Getkey("FiveMinutesBefore")</option>
+                <option value="10 minutes before">@_localization.Getkey("TenMinutesBefore")</option>
+                <option value="15 minutes before">@_localization.Getkey("FifteenMinutesBefore")</option>
+                <option value="25 minutes before">@_localization.Getkey("TwentyFiveMinutesBefore")</option>
+            </select>
+            <span asp-validation-for="Reminder" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Label" class="control-label">@_localization.Getkey("LabelLabel")</label>
+            <select asp-for="Label" class="form-control" required>
+                <option value="">@_localization.Getkey("SelectLabel")</option>
+                <option value="holiday">@_localization.Getkey("Holiday")</option>
+                <option value="meeting">@_localization.Getkey("Meeting")</option>
+                <option value="event">@_localization.Getkey("Event")</option>
+            </select>
+            <span asp-validation-for="Label" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="@_localization.Getkey("CreateButton")" class="btn btn-primary" />
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">@_localization.Getkey("CloseButton")</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#createEventForm').on('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const startDate = new Date($("#StartDate").val());
+            const endDate = new Date($("#EndDate").val());
+
+            // Validate end date is not earlier than start date
+            if (endDate < startDate) {
+                $("#EndDate").next('.text-danger').text(@Html.Raw("@_localization.Getkey('EndDateValidationError')")); // Show error below the field
+                return;
+            }
+
+            const Model = {
+                Title: $("#Title").val(),
+                StartDate: $("#StartDate").val(),
+                EndDate: $("#EndDate").val(),
+                Repeat: $("#Repeat").val(),
+                Location: $("#Location").val(),
+                Attendees: $("#Attendees").val(),
+                Description: $("#Description").val(),
+                Reminder: $("#Reminder").val(),
+                Label: $("#Label").val()
+            };
+
+            // AJAX request to post the new event
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Create", "EventModels")', // Ensure this matches your routing
+                data: JSON.stringify(Model),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (response) {
+                    if (response.success) {
+                        // Notify user and hide modal
+                        $('#createEventModal').modal('hide'); // Close the modal
+                        $('#createEventForm')[0].reset(); // Reset form fields
+                        alert(response.message); // Show success message
+
+                        // Redirect to the calendar page
+                        window.location.href = '@Url.Action("Calendar", "EventModels")'; // Change to your actual calendar action and controller
+                    } else {
+                        alert("Failed to create event: " + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error creating event:", error);
+                    alert("Failed to create event. Please try again.");
+                }
+            });
+        });
+    });
+</script>

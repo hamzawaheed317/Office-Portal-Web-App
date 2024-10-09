@@ -1,0 +1,128 @@
+﻿@model IEnumerable<OfficePortal.Models.MissionandTrainingForm>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.EmployeeName)</th>
+            <th>@Html.DisplayNameFor(model => model.JobTitle)</th>
+            <th>@Html.DisplayNameFor(model => model.Grade)</th>
+            <th>@Html.DisplayNameFor(model => model.Number)</th>
+            <th>@Html.DisplayNameFor(model => model.Department)</th>
+            <th>@Html.DisplayNameFor(model => model.LineManager)</th>
+            <th>@Html.DisplayNameFor(model => model.Type)</th>
+            <th>@Html.DisplayNameFor(model => model.Purpose)</th>
+            <th>@Html.DisplayNameFor(model => model.Departure_date)</th>
+            <th>@Html.DisplayNameFor(model => model.Arrival_date)</th>
+            <th>@Html.DisplayNameFor(model => model.date_from)</th>
+            <th>@Html.DisplayNameFor(model => model.Departure_time)</th>
+            <th>@Html.DisplayNameFor(model => model.Arrival_time)</th>
+            <th>@Html.DisplayNameFor(model => model.status)</th>
+            <th>@Html.DisplayNameFor(model => model.Form_type)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.EmployeeName)</td>
+                <td>@Html.DisplayFor(modelItem => item.JobTitle)</td>
+                <td>@Html.DisplayFor(modelItem => item.Grade)</td>
+                <td>@Html.DisplayFor(modelItem => item.Number)</td>
+                <td>@Html.DisplayFor(modelItem => item.Department)</td>
+                <td>@Html.DisplayFor(modelItem => item.LineManager)</td>
+                <td>@Html.DisplayFor(modelItem => item.Type)</td>
+                <td>@Html.DisplayFor(modelItem => item.Purpose)</td>
+                <td>@Html.DisplayFor(modelItem => item.Departure_date)</td>
+                <td>@Html.DisplayFor(modelItem => item.Arrival_date)</td>
+                <td>@Html.DisplayFor(modelItem => item.date_from)</td>
+                <td>@Html.DisplayFor(modelItem => item.Departure_time)</td>
+                <td>@Html.DisplayFor(modelItem => item.Arrival_time)</td>
+                <td>@Html.DisplayFor(modelItem => item.status)</td>
+                <td>@Html.DisplayFor(modelItem => item.Form_type)</td>
+                <td>
+                    <button class="btn btn-info details-btn" data-id="@item.id" data-toggle="modal" data-target="#detailsModal">Details</button> |
+                    <a asp-action="Delete" asp-route-id="@item.id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <!-- Set modal to large size -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Mission and Training Form Details</h5>
+                <!-- Removed close icon button -->
+            </div>
+            <div class="modal-body">
+                <!-- Details will be loaded here -->
+                <div id="detailsContent" class="details-content"></div> <!-- Custom class for styling -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <style>
+        /* Custom styles for the details content */
+        .details-content {
+            padding: 20px; /* Adjust padding as needed */
+        }
+
+            .details-content p {
+                margin-bottom: 15px; /* Add space between labels and data */
+                font-weight: bold; /* Make labels bold for emphasis */
+            }
+
+            .details-content span {
+                font-weight: normal; /* Normal weight for data */
+                padding-left: 10px; /* Add space between label and data */
+            }
+
+        /* Modal size */
+        .modal-lg {
+            max-width: 70%; /* Adjust modal width */
+        }
+    </style>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.details-btn').on('click', function () {
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '@Url.Action("Details", "MissionandTrainingForms")', // Replace with your actual controller name
+                    type: 'GET',
+                    data: { id: id },
+                    success: function (data) {
+                        $('#detailsContent').html(data);
+                    },
+                    error: function () {
+                        $('#detailsContent').html('<p>An error occurred while loading details.</p>');
+                    }
+                });
+            });
+        });
+    </script>
+}

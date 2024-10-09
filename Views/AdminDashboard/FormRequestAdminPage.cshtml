@@ -1,0 +1,208 @@
+﻿@model IEnumerable<OfficePortal.Models.FormRequestViewModel>
+
+@{
+    ViewData["Title"] = "Form Request Admin Page";
+}
+
+<h1>@_localization.Getkey("FormRequestAdminTitle")</h1>
+
+<!-- Form Request Table -->
+<table class="table table-striped table-hover">
+    <thead class="thead-light">
+        <tr>
+            <th>@_localization.Getkey("EmployeeName")</th>
+            <th>@_localization.Getkey("Department")</th>
+            <th>@_localization.Getkey("PendingWith")</th>
+            <th>@_localization.Getkey("Status")</th>
+            <th>@_localization.Getkey("FormType")</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="row-text">@item.EmployeeName</td>
+                <td class="row-text">@item.Department</td>
+                <td class="row-text">@item.LineManager</td>
+                <td class="row-text">@item.Status</td>
+                <td>
+                    <a href="#" class="form-type-link" data-form-type="@item.FormType" data-id="@item.id" data-toggle="modal" data-target="#detailsModal">
+                        @item.FormType
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Bootstrap Modal for Details -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="detailsContent">
+                <p>Loading...</p>
+                <p style="margin-bottom: 25px;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="approveButton" style="margin-right: auto;">Approve</button>
+                <button type="button" class="btn btn-danger" id="rejectButton">Reject</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS Styles -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: white;
+        color: #333;
+        margin: 20px;
+    }
+
+    h1 {
+        color: black;
+        margin-bottom: 20px;
+        font-size: 2em;
+        text-align: center;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: white;
+    }
+
+        .table th, .table td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+            background-color: white;
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+    .row-text {
+        font-size: 0.9em;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #e9ecef;
+    }
+
+    .form-type-link {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+        .form-type-link:hover {
+            text-decoration: underline;
+        }
+
+    .modal-body p {
+        margin-bottom: 15px;
+        padding-left: 5px;
+    }
+
+    .modal-footer {
+        justify-content: flex-end;
+    }
+
+    .close {
+        margin-left: auto;
+        color: red;
+        font-size: 1.5em;
+    }
+
+        .close:hover {
+            color: darkred;
+            text-decoration: none;
+        }
+</style>
+
+<!-- jQuery and Bootstrap Script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var currentFormType = ""; // Variable to track current form type
+        var currentFormId = "";   // Variable to track current form ID
+
+        $('.form-type-link').click(function (e) {
+            e.preventDefault();
+            currentFormType = $(this).data('form-type');
+            currentFormId = $(this).data('id'); // Get the ID from the data attribute
+
+            // Show loading message in the modal
+            $('#detailsContent').text("Loading details...");
+
+            // Make an AJAX call based on the form type
+            $.ajax({
+                url: currentFormType === "Mission and Training Form"
+                    ? '@Url.Action("MissionandTrainingForm", "AdminDashboard")'
+                    : '@Url.Action("IndexPageTrainingRequestViewModels", "AdminDashboard")',
+                type: 'GET',
+                data: { id: currentFormId },
+                success: function (data) {
+                    $('#detailsContent').html(data); // Display the returned data
+                },
+                error: function () {
+                    $('#detailsContent').text("An error occurred while fetching details.");
+                }
+            });
+        });
+
+        // Function to handle approve/reject actions
+        function updateFormStatus(status) {
+            $.ajax({
+                url: '@Url.Action("UpdateFormStatus", "AdminDashboard")',
+                type: 'POST',
+                data: {
+                    id: currentFormId,
+                    formType: currentFormType,
+                    status: status
+                },
+                success: function (response) {
+                    // Display success message
+                    alert(response.message || `${currentFormType} ${status} successfully!`);
+                    // Redirect to FormRequestAdminPage after successful update
+                    window.location.href = '@Url.Action("FormRequestAdminPage", "AdminDashboard")';
+                },
+                error: function (xhr) {
+                    // Display error message with specific error details if available
+                    var errorMessage = xhr.responseJSON?.message || `An error occurred while updating the ${currentFormType}.`;
+                    alert(errorMessage);
+                }
+            });
+        }
+
+        // Approve button click handler
+        $('#approveButton').click(function () {
+            updateFormStatus("Approved");
+        });
+
+        // Reject button click handler
+        $('#rejectButton').click(function () {
+            updateFormStatus("Rejected");
+        });
+    });
+</script>

@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - OfficePortal</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/OfficePortal.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">OfficePortal</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="AdminDashboard" asp-action="Home">Admin Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Announcements" asp-action="Index">Announcements</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="EventModels" asp-action="Calender">Calendar</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="formsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Forms
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="formsDropdown">
+                                <li><a class="dropdown-item" href="#" data-form="MissionRequest">Mission and Training Form</a></li>
+                                <li><a class="dropdown-item" href="#" data-form="TrainingRequest">Training Request Form</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="AdminDashboard" asp-action="FormRequestAdminPage">Requests</a>
+                        </li>
+                    </ul>
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                            Language
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" data-culture="en-US" class="dropdown-item language-selector"><i class="flag-icon flag-icon-gb"></i> English</a></li>
+                            <li><a href="#" data-culture="ar-SA" class="dropdown-item language-selector"><i class="flag-icon flag-icon-sa"></i> Arabic</a></li>
+                        </ul>
+                    </div>
+                    <p class="nav navbar-text">Hello, @User.Identity?.Name!</p>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - OfficePortal - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- jQuery Script for Forms Dropdown and Localization -->
+    <script>
+        $(document).ready(function () {
+            // Handle click event on Forms dropdown items
+            $('.dropdown-item').click(function (e) {
+                e.preventDefault();  // Prevent default behavior of the link
+
+                // Get the value of the data-form attribute
+                var formType = $(this).data('form');
+
+                // Define URL redirection logic
+                if (formType === 'MissionRequest') {
+                    window.location.href = '/MissionandTrainingForms/Index';  // Redirect to Social Status form page
+                } else if (formType === 'TrainingRequest') {
+                    window.location.href = '/TrainingRequestViewModels/Index';  // Redirect to Training Request form page
+                }
+            });
+
+            // Handle language change click event
+            $('.language-selector').on('click', function (e) {
+                e.preventDefault();  // Prevent default behavior
+
+                var selectedCulture = $(this).data('culture');  // Get the selected culture
+
+                $.ajax({
+                    url: '/Home/ChangeLanguage',  // Controller action for language change
+                    type: 'GET',
+                    data: { culture: selectedCulture },  // Pass the selected culture
+                    success: function (response) {
+                        // Reload the page to apply the language change
+                        window.location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error occurred: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
