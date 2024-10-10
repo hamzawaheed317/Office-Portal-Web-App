@@ -6,8 +6,7 @@
         public string Author { get; set; }
         public string Content { get; set; }
         public DateTime PostedDate { get; set; }
-
         public string status { get; set; }
-        public int AnnouncementId { get; set; } // Foreign key to Announcement
+        public int AnnouncementId { get; set; } 
     }
 }

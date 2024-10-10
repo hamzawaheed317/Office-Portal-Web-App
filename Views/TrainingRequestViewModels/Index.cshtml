@@ -1,4 +1,4 @@
-﻿@model IEnumerable<OfficePortal.Models.TrainingRequestViewModel>
+﻿@model IEnumerable<OfficePortal.Models.Employee_Models.TrainingRequestViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -7,7 +7,7 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#createModal">Create New</button>
 </p>
 
 <table class="table table-striped">
@@ -25,13 +25,13 @@
             <th>@Html.DisplayNameFor(model => model.DateTo)</th>
             <th>@Html.DisplayNameFor(model => model.Location)</th>
             <th>@Html.DisplayNameFor(model => model.Amount)</th>
-            <th>@Html.DisplayNameFor(model => model.form_type)</th>
             <th>@Html.DisplayNameFor(model => model.status)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
+
         {
             <tr>
                 <td>@Html.DisplayFor(modelItem => item.EmployeeName)</td>
@@ -46,21 +46,43 @@
                 <td>@Html.DisplayFor(modelItem => item.DateTo)</td>
                 <td>@Html.DisplayFor(modelItem => item.Location)</td>
                 <td>@Html.DisplayFor(modelItem => item.Amount)</td>
-                <td>@Html.DisplayFor(modelItem => item.form_type)</td>
                 <td>@Html.DisplayFor(modelItem => item.status)</td>
                 <td>
-                    <button class="btn btn-info details-btn" data-id="@item.id" data-toggle="modal" data-target="#detailsModal">Details</button> |
+                    <button class="btn btn-info details-btn" data-id="@item.id" data-toggle="modal" data-target="#detailsModal">Details</button>
                     <a asp-action="Delete" asp-route-id="@item.id" class="btn btn-danger">Delete</a>
+                    @if (item.status == "Rejected" || item.status == "Pending...")
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.id" class="btn btn-warning">Edit</a>
+                    }
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createModalLabel">Create Training Request</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="createContent" class="create-content"></div> <!-- Container for the partial view -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Details Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
-        <!-- Set modal to large size -->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="detailsModalLabel">Training Request Details</h5>
@@ -76,6 +98,11 @@
 </div>
 
 <style>
+    /* Custom styles for the create content */
+    .create-content {
+        padding: 20px; /* Adjust padding as needed */
+    }
+
     /* Custom styles for the details content */
     .details-content {
         padding: 20px; /* Adjust padding as needed */
@@ -103,6 +130,21 @@
 
     <script>
         $(document).ready(function () {
+            // Load create form into the modal
+            $('#createModal').on('show.bs.modal', function () {
+                $.ajax({
+                    url: '@Url.Action("Create", "TrainingRequestViewModels")', // Adjust to your actual controller name
+                    type: 'GET',
+                    success: function (data) {
+                        $('#createContent').html(data);
+                    },
+                    error: function () {
+                        $('#createContent').html('<p>An error occurred while loading the create form.</p>');
+                    }
+                });
+            });
+
+            // Load details into the details modal
             $('.details-btn').on('click', function () {
                 var id = $(this).data('id');
                 $.ajax({

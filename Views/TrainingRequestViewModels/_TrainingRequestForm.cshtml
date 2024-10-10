@@ -1,0 +1,201 @@
+﻿@model OfficePortal.Models.Employee_Models.TrainingRequestViewModel
+
+<h4>@_localization.Getkey("TrainingRequestViewModelHeader")</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create" id="trainingForm" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("EmployeeName")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="EmployeeName" />
+                    <p class="form-control-static">@Model.EmployeeName</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("JobTitle")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="JobTitle" />
+                    <p class="form-control-static">@Model.JobTitle</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Grade")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Grade" />
+                    <p class="form-control-static">@Model.Grade</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Number")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Number" />
+                    <p class="form-control-static">@Model.Number</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Department")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Department" />
+                    <p class="form-control-static">@Model.Department</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("LineManager")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="LineManager" />
+                    <p class="form-control-static">@Model.LineManager</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Type")</label>
+                <div class="col-md-8">
+                    <select asp-for="Type" class="form-control" id="Type" required>
+                        <option value="">@_localization.Getkey("SelectType")</option>
+                        <option value="Online">@_localization.Getkey("Online")</option>
+                        <option value="Offline">@_localization.Getkey("Offline")</option>
+                    </select>
+                    <span class="text-danger" asp-validation-for="Type"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("TrainingEntity")</label>
+                <div class="col-md-8">
+                    <input asp-for="TrainingEntity" class="form-control" id="TrainingEntity" required />
+                    <span class="text-danger" asp-validation-for="TrainingEntity"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("DateFrom")</label>
+                <div class="col-md-8">
+                    <input asp-for="DateFrom" class="form-control" id="DateFrom" type="datetime-local" required />
+                    <span class="text-danger" asp-validation-for="DateFrom"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("DateTo")</label>
+                <div class="col-md-8">
+                    <input asp-for="DateTo" class="form-control" id="DateTo" type="datetime-local" required />
+                    <span class="text-danger" asp-validation-for="DateTo"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Location")</label>
+                <div class="col-md-8">
+                    <input asp-for="Location" class="form-control" id="Location" required />
+                    <span class="text-danger" asp-validation-for="Location"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Amount")</label>
+                <div class="col-md-8">
+                    <input asp-for="Amount" class="form-control" id="Amount" required />
+                    <span class="text-danger" asp-validation-for="Amount"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="hidden" asp-for="form_type" value="Training Request Form" />
+            </div>
+
+            <div class="form-group">
+                <input type="hidden" asp-for="status" value="Pending..." />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="@_localization.Getkey("CreateButton")" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            $('#trainingForm').submit(function (event) {
+                // Clear previous error messages
+                $('.text-danger').text('');
+
+                var valid = true;
+
+                // Validate Type
+                if ($('#Type').val() === '') {
+                    $('#Type').next('.text-danger').text('@_localization.Getkey("ErrorTypeRequired")');
+                    valid = false;
+                }
+
+                // Validate TrainingEntity
+                if ($('#TrainingEntity').val().trim() === '') {
+                    $('#TrainingEntity').next('.text-danger').text('@_localization.Getkey("ErrorTrainingEntityRequired")');
+                    valid = false;
+                }
+
+                // Validate DateFrom
+                var dateFromStr = $('#DateFrom').val().trim();
+                if (dateFromStr === '') {
+                    $('#DateFrom').next('.text-danger').text('@_localization.Getkey("ErrorDateFromRequired")');
+                    valid = false;
+                }
+
+                // Validate DateTo
+                var dateToStr = $('#DateTo').val().trim();
+                if (dateToStr === '') {
+                    $('#DateTo').next('.text-danger').text('@_localization.Getkey("ErrorDateToRequired")');
+                    valid = false;
+                }
+
+                // Validate Date Range if both dates are provided
+                if (dateFromStr && dateToStr) {
+                    var dateFrom = new Date(dateFromStr);
+                    var dateTo = new Date(dateToStr);
+
+                    if (dateFrom > dateTo) {
+                        $('#DateFrom').next('.text-danger').text('@_localization.Getkey("ErrorEndDateBeforeStartDate")');
+                        valid = false;
+                    }
+                }
+
+                // Validate Location
+                if ($('#Location').val().trim() === '') {
+                    $('#Location').next('.text-danger').text('@_localization.Getkey("ErrorLocationRequired")');
+                    valid = false;
+                }
+
+                // Validate Amount
+                if ($('#Amount').val().trim() === '') {
+                    $('#Amount').next('.text-danger').text('@_localization.Getkey("ErrorAmountRequired")');
+                    valid = false;
+                } else if (isNaN($('#Amount').val().trim())) {
+                    $('#Amount').next('.text-danger').text('@_localization.Getkey("ErrorAmountMustBeNumber")');
+                    valid = false;
+                }
+
+                // Prevent form submission if validation fails
+                if (!valid) {
+                    event.preventDefault(); // Prevent form submission
+                    alert('@_localization.Getkey("FormValidationFailure")'); // Failure message
+                } else {
+                    alert('@_localization.Getkey("FormValidationSuccess")'); // Success message
+                }
+            });
+        });
+    </script>
+}

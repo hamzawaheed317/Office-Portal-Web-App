@@ -1,0 +1,180 @@
+﻿@model OfficePortal.Models.Employee_Models.MissionandTrainingForm
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create" id="missionTrainingForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("EmployeeName")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="EmployeeName" />
+                    <p class="form-control-static">@Model.EmployeeName</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("JobTitle")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="JobTitle" />
+                    <p class="form-control-static">@Model.JobTitle</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Grade")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Grade" />
+                    <p class="form-control-static">@Model.Grade</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Number")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Number" />
+                    <p class="form-control-static">@Model.Number</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Department")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Department" />
+                    <p class="form-control-static">@Model.Department</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("LineManager")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="LineManager" />
+                    <p class="form-control-static">@Model.LineManager</p>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Type")</label>
+                <div class="col-md-8">
+                    <input asp-for="Type" class="form-control" />
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("Purpose")</label>
+                <div class="col-md-8">
+                    <input asp-for="Purpose" class="form-control" />
+                    <span asp-validation-for="Purpose" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("DepartureDate")</label>
+                <div class="col-md-8">
+                    <input asp-for="Departure_date" class="form-control" type="date" />
+                    <span asp-validation-for="Departure_date" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("ArrivalDate")</label>
+                <div class="col-md-8">
+                    <input asp-for="Arrival_date" class="form-control" type="date" />
+                    <span asp-validation-for="Arrival_date" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("DateFrom")</label>
+                <div class="col-md-8">
+                    <input asp-for="date_from" class="form-control" type="date" />
+                    <span asp-validation-for="date_from" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("DepartureTime")</label>
+                <div class="col-md-8">
+                    <input asp-for="Departure_time" class="form-control" type="time" />
+                    <span asp-validation-for="Departure_time" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-4">@_localization.Getkey("ArrivalTime")</label>
+                <div class="col-md-8">
+                    <input asp-for="Arrival_time" class="form-control" type="time" />
+                    <span asp-validation-for="Arrival_time" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row" style="display:none;">
+                <label class="col-md-4">@_localization.Getkey("Status")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="status" value="Pending..." />
+                </div>
+            </div>
+
+            <div class="form-group row" style="display:none;">
+                <label class="col-md-4">@_localization.Getkey("FormType")</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Form_type" value="Mission and Training Form" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="@_localization.Getkey("CreateButton")" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            $('#missionTrainingForm').submit(function (event) {
+                var valid = true;
+
+                // Clear previous error messages
+                $('.text-danger').text('');
+
+                // Example validation (add more as needed)
+                if ($('#Type').val().trim() === '') {
+                    $('#Type').siblings('.text-danger').text('@_localization.Getkey("ErrorTypeRequired")');
+                    valid = false;
+                }
+
+                // Validate Departure Date and Arrival Date
+                var departureDate = new Date($('#Departure_date').val());
+                var arrivalDate = new Date($('#Arrival_date').val());
+
+                if (arrivalDate < departureDate) {
+                    $('#Arrival_date').siblings('.text-danger').text('@_localization.Getkey("ErrorArrivalDateGreater")');
+                    valid = false;
+                }
+
+                // Validate Departure Time and Arrival Time
+                var departureTime = $('#Departure_time').val();
+                var arrivalTime = $('#Arrival_time').val();
+
+                // Only compare times if the dates are the same
+                if (arrivalDate.toDateString() === departureDate.toDateString()) {
+                    if (arrivalTime < departureTime) {
+                        $('#Arrival_time').siblings('.text-danger').text('@_localization.Getkey("ErrorArrivalTimeGreater")');
+                        valid = false;
+                    }
+                }
+
+                // Prevent form submission if validation fails
+                if (!valid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+}

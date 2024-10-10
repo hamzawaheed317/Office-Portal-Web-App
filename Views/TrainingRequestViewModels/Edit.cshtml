@@ -1,88 +1,130 @@
-﻿@model OfficePortal.Models.TrainingRequestViewModel
+﻿@model OfficePortal.Models.Employee_Models.TrainingRequestViewModel
 
 @{
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Edit Training Request</h1>
 
 <h4>TrainingRequestViewModel</h4>
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
+    <div class="col-md-8">
+        <!-- Increased column width -->
+        <form asp-action="Edit" id="trainingForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="id" />
-            <div class="form-group">
-                <label asp-for="EmployeeName" class="control-label"></label>
-                <input asp-for="EmployeeName" class="form-control" />
-                <span asp-validation-for="EmployeeName" class="text-danger"></span>
+
+            <!-- Static Fields (EmployeeName, JobTitle, Grade, etc.) -->
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Employee Name</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="EmployeeName" />
+                    <p class="form-control-static">@Model.EmployeeName</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="JobTitle" class="control-label"></label>
-                <input asp-for="JobTitle" class="form-control" />
-                <span asp-validation-for="JobTitle" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Job Title</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="JobTitle" />
+                    <p class="form-control-static">@Model.JobTitle</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Grade" class="control-label"></label>
-                <input asp-for="Grade" class="form-control" />
-                <span asp-validation-for="Grade" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Grade</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Grade" />
+                    <p class="form-control-static">@Model.Grade</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Number" class="control-label"></label>
-                <input asp-for="Number" class="form-control" />
-                <span asp-validation-for="Number" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Number</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Number" />
+                    <p class="form-control-static">@Model.Number</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Department" class="control-label"></label>
-                <input asp-for="Department" class="form-control" />
-                <span asp-validation-for="Department" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Department</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Department" />
+                    <p class="form-control-static">@Model.Department</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="LineManager" class="control-label"></label>
-                <input asp-for="LineManager" class="form-control" />
-                <span asp-validation-for="LineManager" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Line Manager</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="LineManager" />
+                    <p class="form-control-static">@Model.LineManager</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Type" class="control-label"></label>
-                <input asp-for="Type" class="form-control" />
-                <span asp-validation-for="Type" class="text-danger"></span>
+
+            <!-- Editable Fields -->
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Type</label>
+                <div class="col-md-8">
+                    <select asp-for="Type" class="form-control" id="Type">
+                        <option value="">Select Type</option>
+                        <option value="Online">Online</option>
+                        <option value="Offline">Offline</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="TrainingEntity" class="control-label"></label>
-                <input asp-for="TrainingEntity" class="form-control" />
-                <span asp-validation-for="TrainingEntity" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Training Entity</label>
+                <div class="col-md-8">
+                    <input asp-for="TrainingEntity" class="form-control" id="TrainingEntity" />
+                    <span asp-validation-for="TrainingEntity" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="DateFrom" class="control-label"></label>
-                <input asp-for="DateFrom" class="form-control" />
-                <span asp-validation-for="DateFrom" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Date From</label>
+                <div class="col-md-8">
+                    <input asp-for="DateFrom" class="form-control" id="DateFrom" type="datetime-local" />
+                    <span asp-validation-for="DateFrom" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="DateTo" class="control-label"></label>
-                <input asp-for="DateTo" class="form-control" />
-                <span asp-validation-for="DateTo" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Date To</label>
+                <div class="col-md-8">
+                    <input asp-for="DateTo" class="form-control" id="DateTo" type="datetime-local" />
+                    <span asp-validation-for="DateTo" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Location</label>
+                <div class="col-md-8">
+                    <input asp-for="Location" class="form-control" id="Location" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Amount" class="control-label"></label>
-                <input asp-for="Amount" class="form-control" />
-                <span asp-validation-for="Amount" class="text-danger"></span>
+
+            <div class="form-group row">
+                <label class="col-md-4 control-label">Amount</label>
+                <div class="col-md-8">
+                    <input asp-for="Amount" class="form-control" id="Amount" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
             </div>
+
             <div class="form-group">
-                <label asp-for="form_type" class="control-label"></label>
-                <input asp-for="form_type" class="form-control" />
-                <span asp-validation-for="form_type" class="text-danger"></span>
+                <input type="hidden" asp-for="form_type" value="Training Request Form" />
             </div>
+
             <div class="form-group">
-                <label asp-for="status" class="control-label"></label>
-                <input asp-for="status" class="form-control" />
-                <span asp-validation-for="status" class="text-danger"></span>
+                <input type="hidden" asp-for="status" value="Pending..." />
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -95,5 +137,68 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            $('#trainingForm').submit(function (event) {
+                var valid = true;
+
+                // Clear previous error messages
+                $('.text-danger').text('');
+
+                // Validate Type
+                if ($('#Type').val() === '') {
+                    $('#typeError').text('Type is required.');
+                    valid = false;
+                }
+
+                // Validate TrainingEntity
+                if ($('#TrainingEntity').val().trim() === '') {
+                    $('#trainingEntityError').text('Training Entity is required.');
+                    valid = false;
+                }
+
+                // Validate DateFrom
+                if ($('#DateFrom').val().trim() === '') {
+                    $('#dateFromError').text('Start Date is required.');
+                    valid = false;
+                }
+
+                // Validate DateTo
+                if ($('#DateTo').val().trim() === '') {
+                    $('#dateToError').text('End Date is required.');
+                    valid = false;
+                }
+
+                // Validate Date Range
+                var dateFrom = new Date($('#DateFrom').val());
+                var dateTo = new Date($('#DateTo').val());
+
+                if (dateFrom > dateTo) {
+                    $('#dateFromError').text('Invalid date range.');
+                    valid = false;
+                }
+
+                // Validate Location
+                if ($('#Location').val().trim() === '') {
+                    $('#locationError').text('Location is required.');
+                    valid = false;
+                }
+
+                // Validate Amount
+                if ($('#Amount').val().trim() === '') {
+                    $('#amountError').text('Amount is required.');
+                    valid = false;
+                }
+
+                // Prevent form submission if validation fails
+                if (!valid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 }

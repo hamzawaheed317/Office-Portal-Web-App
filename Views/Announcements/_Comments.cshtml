@@ -1,0 +1,19 @@
+﻿@model IEnumerable<OfficePortal.Models.Comment>
+
+<div id="comments-list">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var comment in Model)
+        {
+            <div class="comment-item">
+                <p><strong>@comment.Author</strong> (@comment.PostedDate.ToString("MM/dd/yyyy"))</p>
+                <p>@comment.Content</p>
+                <hr />
+            </div>
+        }
+    }
+    else
+    {
+        <p>No comments available.</p>
+    }
+</div>
