@@ -41,16 +41,22 @@
 <body>
 
     <div class="container">
-        <h1>FullCalendar with Events</h1>
+        <h1>Events</h1>
 
         <!-- View Buttons for Day, Week, Month and Create Event Button -->
         <div class="btn-group mb-3">
             <button id="btnDay" class="btn btn-secondary">Day</button>
             <button id="btnWeek" class="btn btn-secondary">Week</button>
             <button id="btnMonth" class="btn btn-secondary">Month</button>
-            <button type="button" class="btn btn-primary create-event-btn" data-toggle="modal" data-target="#createEventModal">
-                Create Event
-            </button>
+
+            @* Only show this button to users with the Admin role *@
+            @if (User.IsInRole("Admin"))
+            {
+                <button type="button" class="btn btn-primary create-event-btn" data-toggle="modal" data-target="#createEventModal">
+                    Create Event
+                </button>
+            }
+
         </div>
 
         <!-- Loader -->
@@ -75,60 +81,71 @@
             </div>
         </div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var calendarEl = document.getElementById('calendar');
-                var loader = document.getElementById('loader');
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'dayGridMonth',
-                    editable: true,
-                    selectable: true,
+     <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var loader = document.getElementById('loader');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            editable: true,
+            selectable: true,
+             editable: false,
 
-                    // Fetch events from the controller
-                    events: function (fetchInfo, successCallback, failureCallback) {
-                        loader.style.display = 'block'; // Show loader
-                        $.ajax({
-                            url: '@Url.Action("GetEvents", "EventModels")', // Ensure this matches your routing
-                            type: 'GET',
-                            dataType: 'json',
-                            success: function (data) {
-                                successCallback(data); // Pass the events to FullCalendar
-                                loader.style.display = 'none'; // Hide loader after fetching
-                            },
-                            error: function (xhr, status, error) {
-                                console.error("Error fetching events:", error);
-                                failureCallback(error); // Handle the error
-                                loader.style.display = 'none'; // Hide loader on error
-                            }
+            // Fetch events from the controller
+            events: function (fetchInfo, successCallback, failureCallback) {
+                loader.style.display = 'block'; // Show loader
+                $.ajax({
+                    url: '@Url.Action("GetEvents", "EventModels")', // Ensure this matches your routing
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        // Map the data to FullCalendar's event format if necessary
+                        var events = data.map(function(event) {
+                            return {
+                                id: event.id, // Ensure this matches your event model
+                                title: event.title, // Event title
+                                start: event.start, // Start date
+                                end: event.end, // End date
+                                description: event.description, // Optional: If you want to display description in tooltips or popups
+                                label: event.label // Optional: If you have a label to display
+                            };
                         });
+                        successCallback(events); // Pass the events to FullCalendar
+                        loader.style.display = 'none'; // Hide loader after fetching
                     },
-
-                    // Handle event creation via modal
-                    dateClick: function (info) {
-                        $('#startDate').val(info.dateStr);
-                        $('#endDate').val(info.dateStr);
-                        $('#createEventModal').modal('show');
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching events:", error);
+                        failureCallback(error); // Handle the error
+                        loader.style.display = 'none'; // Hide loader on error
                     }
                 });
+            },
 
-                calendar.render();
+            // Handle event creation via modal
+            dateClick: function (info) {
+                $('#startDate').val(info.dateStr);
+                $('#endDate').val(info.dateStr);
+                $('#createEventModal').modal('show');
+            }
+        });
 
-               
+        calendar.render();
 
-                // Button click events to switch views
-                $('#btnDay').on('click', function() {
-                    calendar.changeView('timeGridDay'); // Change to day view
-                });
+        // Button click events to switch views
+        $('#btnDay').on('click', function() {
+            calendar.changeView('timeGridDay'); // Change to day view
+        });
 
-                $('#btnWeek').on('click', function() {
-                    calendar.changeView('timeGridWeek'); // Change to week view
-                });
+        $('#btnWeek').on('click', function() {
+            calendar.changeView('timeGridWeek'); // Change to week view
+        });
 
-                $('#btnMonth').on('click', function() {
-                    calendar.changeView('dayGridMonth'); // Change to month view
-                });
-            });
-        </script>
+        $('#btnMonth').on('click', function() {
+            calendar.changeView('dayGridMonth'); // Change to month view
+        });
+    });
+</script>
+
     </div>
 
 </body>

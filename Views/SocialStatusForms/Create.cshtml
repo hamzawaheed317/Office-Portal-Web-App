@@ -1,0 +1,190 @@
+﻿@model OfficePortal.Models.Employee_Models.SocialStatusFormViewModel
+
+@{
+    ViewData["Title"] = "Create Social Status Form";
+}
+
+<h1>Create Social Status Form</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Static Employee Information -->
+            <div class="form-group">
+                <label class="col-md-4" asp-for="EmployeeName">Employee Name</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="EmployeeName" />
+                    <p class="form-control-static">@Model.EmployeeName</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4" asp-for="JobTitle">Job Title</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="JobTitle" />
+                    <p class="form-control-static">@Model.JobTitle</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4" asp-for="Nationality">Nationality</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Nationality" />
+                    <p class="form-control-static">@Model.Nationality</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4" asp-for="Department">Department</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="Department" />
+                    <p class="form-control-static">@Model.Department</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4">BayanatiNumber</label>
+                <div class="col-md-8">
+                    <input type="hidden" asp-for="BayanatiNumber" />
+                    <p class="form-control-static">@Model.BayanatiNumber</p>
+                </div>
+            </div>
+
+            <!-- Form Hidden Fields -->
+            <input asp-for="Form_Type" type="hidden" value="Social Status Form" />
+            <input asp-for="Status" type="hidden" value="Pending..." />
+
+            <!-- Spouse and Children's Information -->
+            <div class="form-group">
+                <label asp-for="JoiningDate" class="control-label"></label>
+                <input asp-for="JoiningDate" class="form-control" />
+                <span asp-validation-for="JoiningDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SpouseFullName" class="control-label"></label>
+                <input asp-for="SpouseFullName" class="form-control" />
+                <span asp-validation-for="SpouseFullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SpouseWorkplace" class="control-label"></label>
+                <input asp-for="SpouseWorkplace" class="form-control" />
+                <span asp-validation-for="SpouseWorkplace" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SpouseDateOfMarriage" class="control-label"></label>
+                <input asp-for="SpouseDateOfMarriage" class="form-control" />
+                <span asp-validation-for="SpouseDateOfMarriage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SpouseDateOfEmployment" class="control-label"></label>
+                <input asp-for="SpouseDateOfEmployment" class="form-control" />
+                <span asp-validation-for="SpouseDateOfEmployment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NumberOfChildren" class="control-label"></label>
+                <input asp-for="NumberOfChildren" class="form-control" />
+                <span asp-validation-for="NumberOfChildren" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SonName" class="control-label"></label>
+                <input asp-for="SonName" class="form-control" />
+                <span asp-validation-for="SonName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReasonForChange" class="control-label"></label>
+                <input asp-for="ReasonForChange" class="form-control" />
+                <span asp-validation-for="ReasonForChange" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateOfChange" class="control-label"></label>
+                <input asp-for="DateOfChange" class="form-control" />
+                <span asp-validation-for="DateOfChange" class="text-danger"></span>
+            </div>
+
+            <!-- File Upload Section -->
+            <div class="form-group">
+                <label>Uploaded Files (Max 5 files, total 5MB):</label>
+                <input type="file" id="fileInput" name="UploadedFiles" class="form-control" multiple />
+                <small class="form-text text-muted">Optional. You can add up to 5 files with a total size of 5MB.</small>
+                <ul id="fileList" class="list-unstyled mt-2"></ul>
+                <span class="text-danger" id="fileError"></span>
+            </div>
+            <!-- Submit Button -->
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+ @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }    
+    <script>
+        $(document).ready(function () {
+            const maxFiles = 5;
+            const maxTotalSize = 5 * 1024 * 1024; // 5MB
+            let totalFileSize = 0;
+            let fileList = [];
+            const allowedExtensions = ["jpeg", "jpg", "pdf"]; // Allowed file types
+
+            // Function to display files and update total size
+            function updateFileList() {
+                $('#fileList').empty();
+                totalFileSize = 0;
+                fileList.forEach((file, index) => {
+                    totalFileSize += file.size;
+                    $('#fileList').append(
+                        `<li>${file.name} (${(file.size / 1024).toFixed(2)} KB) <button type="button" class="btn btn-sm btn-danger remove-file" data-index="${index}">Remove</button></li>`
+                    );
+                });
+                $('#fileError').text(totalFileSize > maxTotalSize ? "Total file size exceeds 5MB." : "");
+            }
+
+            // Function to validate file type
+            function isFileTypeValid(fileName) {
+                const extension = fileName.split('.').pop().toLowerCase();
+                return allowedExtensions.includes(extension);
+            }
+
+            // Handle file selection
+            $('input[type="file"]').on('change', function () {
+                const newFiles = Array.from(this.files);
+                let isValid = true;
+
+                // Check file count limit
+                if (fileList.length + newFiles.length > maxFiles) {
+                    $('#fileError').text("You can only add up to 5 files.");
+                    this.value = ""; // Clear file input
+                    return;
+                }
+
+                newFiles.forEach(file => {
+                    if (!isFileTypeValid(file.name)) {
+                        $('#fileError').text(`Invalid file type: ${file.name}. Only jpeg, jpg, and pdf are allowed.`);
+                        isValid = false;
+                        return false; // Stop further checks
+                    }
+                    if (totalFileSize + file.size <= maxTotalSize) {
+                        fileList.push(file);
+                    } else {
+                        $('#fileError').text("Total file size exceeds 5MB.");
+                        isValid = false;
+                    }
+                });
+
+                if (isValid) {
+                    updateFileList();
+                } else {
+                    this.value = ""; // Clear file input if validation fails
+                }
+            });
+
+            // Handle file removal
+            $('#fileList').on('click', '.remove-file', function () {
+                const index = $(this).data('index');
+                fileList.splice(index, 1);
+                updateFileList();
+            });
+        });
+    </script>
+}

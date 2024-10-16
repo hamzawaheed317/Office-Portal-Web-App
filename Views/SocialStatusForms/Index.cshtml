@@ -1,0 +1,84 @@
+﻿@model IEnumerable<OfficePortal.Models.Employee_Models.SocialStatusForm>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Social Status Forms</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.EmployeeName)</th>
+            <th>@Html.DisplayNameFor(model => model.JobTitle)</th>
+            <th>@Html.DisplayNameFor(model => model.Nationality)</th>
+            <th>@Html.DisplayNameFor(model => model.Department)</th>
+            <th>@Html.DisplayNameFor(model => model.BayanatiNumber)</th>
+            <th>@Html.DisplayNameFor(model => model.JoiningDate)</th>
+            <th>@Html.DisplayNameFor(model => model.SpouseFullName)</th>
+            <th>@Html.DisplayNameFor(model => model.SpouseWorkplace)</th>
+            <th>@Html.DisplayNameFor(model => model.SpouseDateOfMarriage)</th>
+            <th>@Html.DisplayNameFor(model => model.SpouseDateOfEmployment)</th>
+            <th>@Html.DisplayNameFor(model => model.NumberOfChildren)</th>
+            <th>@Html.DisplayNameFor(model => model.SonName)</th>
+            <th>@Html.DisplayNameFor(model => model.ReasonForChange)</th>
+            <th>@Html.DisplayNameFor(model => model.DateOfChange)</th>
+            <th>@Html.DisplayNameFor(model => model.Form_Type)</th>
+            <th>@Html.DisplayNameFor(model => model.Status)</th>
+            <th>Files</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.EmployeeName)</td>
+                <td>@Html.DisplayFor(modelItem => item.JobTitle)</td>
+                <td>@Html.DisplayFor(modelItem => item.Nationality)</td>
+                <td>@Html.DisplayFor(modelItem => item.Department)</td>
+                <td>@Html.DisplayFor(modelItem => item.BayanatiNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.JoiningDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.SpouseFullName)</td>
+                <td>@Html.DisplayFor(modelItem => item.SpouseWorkplace)</td>
+                <td>@Html.DisplayFor(modelItem => item.SpouseDateOfMarriage)</td>
+                <td>@Html.DisplayFor(modelItem => item.SpouseDateOfEmployment)</td>
+                <td>@Html.DisplayFor(modelItem => item.NumberOfChildren)</td>
+                <td>@Html.DisplayFor(modelItem => item.SonName)</td>
+                <td>@Html.DisplayFor(modelItem => item.ReasonForChange)</td>
+                <td>@Html.DisplayFor(modelItem => item.DateOfChange)</td>
+                <td>@Html.DisplayFor(modelItem => item.Form_Type)</td>
+                <td>@Html.DisplayFor(modelItem => item.Status)</td>
+
+                <!-- Display Related Files -->
+                <td>
+                    @if (item.Files != null && item.Files.Any())
+                    {
+                        <ul>
+                            @foreach (var file in item.Files)
+                            {
+                                <li>
+                                    <a href="@Url.Content($"~/uploads/{item.Id}/{file.File_Name}")" target="_blank">@file.File_Name</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>No files</span>
+                    }
+                </td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

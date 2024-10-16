@@ -11,7 +11,10 @@
         public string Line_Manager { get; set; }
         public string Department { get; set; }
         public string role { get; set; }
+        public string Admin_email { get; set; }
 
+        public string USer_role { get; set; }
 
+        public List<string> Attendies { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using OfficePortal.Data;
 using OfficePortal.Models.Account_Models;
 using OfficePortal.Models.Employee_Models;
 using OfficePortal.Services;
+using WebApplication1.Services;
 
 namespace OfficePortal.Controllers.Employee_Controllers
 {
@@ -13,12 +14,16 @@ namespace OfficePortal.Controllers.Employee_Controllers
         private readonly ApplicationDbContext _context;
         private LanguageService _localization;
         private readonly IEmailService _emailService;
+        private readonly IActiveDirectoryService _activeDirectoryService;
+        private UserInfo _userInfo;
 
-        public TrainingRequestViewModelsController(ApplicationDbContext context, LanguageService localization, IEmailService emailService)
+        public TrainingRequestViewModelsController(ApplicationDbContext context, LanguageService localization, IEmailService emailService, IActiveDirectoryService activeDirectoryService)
         {
             _context = context;
             _localization = localization;
             _emailService = emailService;
+            _activeDirectoryService = activeDirectoryService;
+            _userInfo = _activeDirectoryService.GetUserInfo();
 
         }
 
@@ -49,16 +54,16 @@ namespace OfficePortal.Controllers.Employee_Controllers
         // GET: TrainingRequestViewModels/Create
         public IActionResult Create()
         {
-            UserInfo userInfo = GetUserInfo(); // Replace this with actual fetching logic
 
             TrainingRequestViewModel model = new TrainingRequestViewModel
             {
-                EmployeeName = userInfo.Employee_Name,
-                JobTitle = userInfo.Job_Title,
-                Grade = userInfo.Grade,
-                Number = userInfo.Employee_Number.ToString(),
-                Department = userInfo.Department,
-                LineManager = userInfo.role
+
+                EmployeeName = _userInfo.Employee_Name,
+                JobTitle = _userInfo.Job_Title,
+                Grade = _userInfo.Grade,
+                Number = _userInfo.Employee_Number.ToString(),
+                Department = _userInfo.Department,
+                LineManager = _userInfo.role
             };
 
             // Assuming this method populates all the necessary employee details into the model
@@ -73,7 +78,6 @@ namespace OfficePortal.Controllers.Employee_Controllers
         {
             if (ModelState.IsValid)
             {
-                UserInfo userInfo = GetUserInfo(); // Replace this with actual fetching logic
 
                 _context.TrainingRequestViewModel.Add(trainingRequestViewModel);
                 await _context.SaveChangesAsync();
@@ -86,25 +90,13 @@ namespace OfficePortal.Controllers.Employee_Controllers
                                      $"Location: {trainingRequestViewModel.Location}\n";
 
                 // Send email
-                await _emailService.SendEmailAsync(userInfo.email, subject, messageText);
+                await _emailService.SendEmailAsync(_userInfo.Admin_email, subject, messageText);
                 return RedirectToAction(nameof(Index));
             }
             return View(trainingRequestViewModel);
         }
 
-        private UserInfo GetUserInfo()
-        {
-            return new UserInfo
-            {
-                Employee_Name = "John Doe",
-                Job_Title = "Software Engineer",
-                Grade = "A1",
-                Employee_Number = "12345",
-                Department = "IT",
-                role = "Line Manager",
-                email = "hasanmughal538@gmail.com"
-            };
-        }
+       
         // GET: TrainingRequestViewModels/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

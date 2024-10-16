@@ -8,6 +8,10 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OfficePortal.Data;
+using WebApplication1.Services;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using OfficePortal.Models.Account_Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,16 +49,44 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 builder.Services.AddControllersWithViews();
 
 // Register EmailService with SMTP configuration
-builder.Services.AddScoped<IEmailService, EmailService>();
+// Bind EmailSettings configuration
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
+// Get EmailSettings instance from configuration
+var emailSettings = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
+
+// Register IEmailService with EmailService, passing EmailSettings
+builder.Services.AddTransient<IEmailService>(_ => new EmailService(
+    emailSettings.SMTPServer,
+    emailSettings.SMTPPort,
+    emailSettings.SenderEmail,
+    emailSettings.SenderName,
+    emailSettings.EmailPassword
+));
+// Register the Active Directory service
+builder.Services.AddScoped<IActiveDirectoryService, ActiveDirectoryService>();
+
+// Register Claims Transformation for Role-Based Claims from Active Directory
+builder.Services.AddTransient<IClaimsTransformation, CustomClaimsTransformation>();
+
+// Configure Windows Authentication
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
     .AddNegotiate();
 
 builder.Services.AddAuthorization(options =>
 {
-    // By default, all incoming requests will be authorized according to the default policy.
+    // Define role-based authorization policies
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("EmployeePolicy", policy => policy.RequireRole("Employee"));
+
+    // Define a combined policy for both Admin and Employee roles
+    options.AddPolicy("AdminEmployeePolicy", policy =>
+        policy.RequireRole("Admin", "Employee")); // Allow access for both roles
+
+    // Use the fallback policy as the default policy
     options.FallbackPolicy = options.DefaultPolicy;
 });
+
 
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -79,10 +111,12 @@ app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocal
 
 app.UseRouting();
 
+// Enable Authentication and Authorization middleware
+app.UseAuthentication(); // Ensure this comes before UseAuthorization
 app.UseAuthorization();
 
 // Middleware to check if the user is on a mobile device and handle redirects
-app.Use(async (context, next) =>
+/*app.Use(async (context, next) =>
 {
     var userAgentService = context.RequestServices.GetRequiredService<UserAgentService>();
 
@@ -107,7 +141,7 @@ app.Use(async (context, next) =>
 
     // If no redirection is needed, continue processing the request
     await next();
-});
+});*/
 
 // Set up default routing with fallback
 app.MapControllerRoute(

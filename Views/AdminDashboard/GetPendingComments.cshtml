@@ -1,0 +1,113 @@
+﻿@model IEnumerable<OfficePortal.Models.Comment>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Comments</title>
+
+    <!-- Bootstrap CSS for responsive layout and styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        .comment-card {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .approve-button, .reject-button {
+            margin-left: 10px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            color: white; /* Text color */
+        }
+
+        .approve-button {
+            background-color: green; /* Green for approve button */
+        }
+
+        .reject-button {
+            background-color: red; /* Red for reject button */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Pending Comments</h2>
+
+        @if (!Model.Any())
+        {
+            <p>No pending comments found.</p>
+        }
+        else
+        {
+            foreach (var comment in Model)
+            {
+                <div class="comment-card">
+                    <div class="comment-content">
+                        <p>@comment.Content</p>
+                        <small>Posted by: @comment.Author on @comment.PostedDate.ToString("MMMM dd, yyyy")</small>
+                    </div>
+                    <div class="action-buttons">
+                        <!-- Form for Approving Comments -->
+                        <form asp-action="UpdateCommentStatus" asp-controller="AdminDashboard" method="post" style="display:inline;" class="comment-form">
+                            <input type="hidden" name="id" value="@comment.Id" />
+                            <input type="hidden" name="newStatus" value="Approved" />
+                            <button type="submit" class="approve-button">Approve</button>
+                        </form>
+
+                        <!-- Form for Rejecting Comments -->
+                        <form asp-action="UpdateCommentStatus" asp-controller="AdminDashboard" method="post" style="display:inline;" class="comment-form">
+                            <input type="hidden" name="id" value="@comment.Id" />
+                            <input type="hidden" name="newStatus" value="Rejected" />
+                            <button type="submit" class="reject-button">Reject</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- jQuery for AJAX functionality -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.comment-form').on('submit', function (event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                var form = $(this); // Get the current form
+                $.ajax({
+                    type: form.attr('method'), // GET or POST
+                    url: form.attr('action'), // The URL to submit to
+                    data: form.serialize(), // Serialize the form data
+                    success: function (response) {
+                        if (response.success) {
+                            alert("Comment status updated successfully!");
+                            location.reload(); // Refresh the page to show updated comments
+                        } else {
+                            alert("Error: " + response.message); // Show specific error message
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("An error occurred: " + xhr.responseText); // Show error
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>

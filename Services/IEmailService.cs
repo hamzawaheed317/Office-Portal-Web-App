@@ -9,11 +9,20 @@ public interface IEmailService
 
 public class EmailService : IEmailService
 {
-    private readonly string _smtpServer = "smtp.gmail.com";
-    private readonly int _smtpPort = 465;
-    private readonly string _senderEmail = "hwtechenterprisellc@gmail.com";  // Update with your email
-    private readonly string _senderName = "HW Tech";  // Update with your name
-    private readonly string _emailPassword = "hwkizgohhdssebjo";  // Secure this value in configuration
+    private readonly string _smtpServer;
+    private readonly int _smtpPort;
+    private readonly string _senderEmail;
+    private readonly string _senderName;
+    private readonly string _emailPassword;
+
+    public EmailService(string smtpServer, int smtpPort, string senderEmail, string senderName, string emailPassword)
+    {
+        _smtpServer = smtpServer;
+        _smtpPort = smtpPort;
+        _senderEmail = senderEmail;
+        _senderName = senderName;
+        _emailPassword = emailPassword;
+    }
 
     public async Task SendEmailAsync(string toEmail, string subject, string messageText)
     {

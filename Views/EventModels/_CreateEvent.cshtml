@@ -9,74 +9,74 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
-            <label asp-for="Title" class="control-label"></label>
+            <label asp-for="Title" class="control-label">@_localization.Getkey("Title")</label>
             <input asp-for="Title" class="form-control" required />
             <span asp-validation-for="Title" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="StartDate" class="control-label"></label>
+            <label asp-for="StartDate" class="control-label">@_localization.Getkey("StartDate")</label>
             <input asp-for="StartDate" type="datetime-local" class="form-control" required />
             <span asp-validation-for="StartDate" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="EndDate" class="control-label"></label>
+            <label asp-for="EndDate" class="control-label">@_localization.Getkey("EndDate")</label>
             <input asp-for="EndDate" type="datetime-local" class="form-control" required />
             <span asp-validation-for="EndDate" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="Repeat" class="control-label"></label>
+            <label asp-for="Repeat" class="control-label">@_localization.Getkey("Repeat")</label>
             <select asp-for="Repeat" class="form-control" required>
-                <option value="">Select Repeat Option</option>
-                <option value="dont repeat">Don't Repeat</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
+                <option value="">@_localization.Getkey("SelectRepeatOption")</option>
+                <option value="dont repeat">@_localization.Getkey("DontRepeat")</option>
+                <option value="daily">@_localization.Getkey("Daily")</option>
+                <option value="weekly">@_localization.Getkey("Weekly")</option>
+                <option value="monthly">@_localization.Getkey("Monthly")</option>
+                <option value="yearly">@_localization.Getkey("Yearly")</option>
             </select>
             <span asp-validation-for="Repeat" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="Location" class="control-label"></label>
+            <label asp-for="Location" class="control-label">@_localization.Getkey("Location")</label>
             <input asp-for="Location" class="form-control" required />
             <span asp-validation-for="Location" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="Attendees" class="control-label"></label>
+            <label asp-for="Attendees" class="control-label">@_localization.Getkey("Attendees")</label>
             <input asp-for="Attendees" class="form-control" required />
             <span asp-validation-for="Attendees" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="Description" class="control-label"></label>
+            <label asp-for="Description" class="control-label">@_localization.Getkey("Description")</label>
             <input asp-for="Description" class="form-control" />
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="Reminder" class="control-label"></label>
+            <label asp-for="Reminder" class="control-label">@_localization.Getkey("Reminder")</label>
             <select asp-for="Reminder" class="form-control" required>
-                <option value="">Select Reminder Option</option>
-                <option value="when the event starts">When the Event Starts</option>
-                <option value="5 minutes before">5 Minutes Before</option>
-                <option value="10 minutes before">10 Minutes Before</option>
-                <option value="15 minutes before">15 Minutes Before</option>
-                <option value="25 minutes before">25 Minutes Before</option>
+                <option value="">@_localization.Getkey("SelectReminderOption")</option>
+                <option value="when the event starts">@_localization.Getkey("WhenTheEventStarts")</option>
+                <option value="5 minutes before">@_localization.Getkey("5MinutesBefore")</option>
+                <option value="10 minutes before">@_localization.Getkey("10MinutesBefore")</option>
+                <option value="15 minutes before">@_localization.Getkey("15MinutesBefore")</option>
+                <option value="25 minutes before">@_localization.Getkey("25MinutesBefore")</option>
             </select>
             <span asp-validation-for="Reminder" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label asp-for="Label" class="control-label"></label>
+            <label asp-for="Label" class="control-label">@_localization.Getkey("Label")</label>
             <select asp-for="Label" class="form-control" required>
-                <option value="">Select Label Option</option>
-                <option value="holiday">Holiday</option>
-                <option value="meeting">Meeting</option>
-                <option value="event">Event</option>
+                <option value="">@_localization.Getkey("SelectLabelOption")</option>
+                <option value="holiday">@_localization.Getkey("Holiday")</option>
+                <option value="meeting">@_localization.Getkey("Meeting")</option>
+                <option value="event">@_localization.Getkey("Event")</option>
             </select>
             <span asp-validation-for="Label" class="text-danger"></span>
         </div>
@@ -100,7 +100,7 @@
 
             // Validate end date is not earlier than start date
             if (endDate < startDate) {
-                alert("End date must be greater than or equal to the start date.");
+                alert("@_localization.Getkey("EndDateValidationMessage")"); // Use localized message
                 return;
             }
 
@@ -134,12 +134,12 @@
                         // Redirect to the calendar page
                         window.location.href = '@Url.Action("Calender", "EventModels")'; // Change to your actual calendar action and controller
                     } else {
-                        alert("Failed to create event: " + response.message);
+                        alert("@_localization.Getkey("FailedToCreateEvent")"); // Use localized message
                     }
                 },
                 error: function (xhr, status, error) {
                     console.error("Error creating event:", error);
-                    alert("Failed to create event. Please try again.");
+                    alert("@_localization.Getkey("FailedToCreateEventError")"); // Use localized message
                 }
             });
         });

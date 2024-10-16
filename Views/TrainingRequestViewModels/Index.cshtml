@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<OfficePortal.Models.Employee_Models.TrainingRequestViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Training Request Form";
 }
 
 <h1>Index</h1>
@@ -126,6 +126,8 @@
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -137,6 +139,8 @@
                     type: 'GET',
                     success: function (data) {
                         $('#createContent').html(data);
+                        // Reinitialize jQuery validation
+                        $.validator.unobtrusive.parse($('#createContent'));
                     },
                     error: function () {
                         $('#createContent').html('<p>An error occurred while loading the create form.</p>');

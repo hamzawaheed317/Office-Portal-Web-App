@@ -19,30 +19,35 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="AdminDashboard" asp-action="Home">Admin Home</a>
-                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="AdminDashboard" asp-action="Home">Admin Home</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Announcements" asp-action="Index">Announcements</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="EventModels" asp-action="Calender">Calendar</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="formsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Forms
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="formsDropdown">
-                                <li><a class="dropdown-item" href="#" data-form="MissionRequest">Mission and Training Form</a></li>
-                                <li><a class="dropdown-item" href="#" data-form="TrainingRequest">Training Request Form</a></li>
-                            </ul>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Files" asp-action="Index">Announcements</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="AdminDashboard" asp-action="FormRequestAdminPage">Requests</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="EventModels" asp-action="Calender">Calendar</a>
                         </li>
+                          @if (User.IsInRole("Employee"))
+            {
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="formsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Forms
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="formsDropdown">
+                                    <li><a class="dropdown-item" href="#" data-form="MissionRequest">Mission and Training Form</a></li>
+                                    <li><a class="dropdown-item" href="#" data-form="TrainingRequest">Training Request Form</a></li>
+                                    <li><a class="dropdown-item" href="#" data-form="Socialstatus">Social Status Form</a></li>
+                                </ul>
+                            </li>
+                        } 
                     </ul>
                     <div class="dropdown">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
@@ -88,6 +93,8 @@
                     window.location.href = '/MissionandTrainingForms/Index';  // Redirect to Social Status form page
                 } else if (formType === 'TrainingRequest') {
                     window.location.href = '/TrainingRequestViewModels/Index';  // Redirect to Training Request form page
+                } else if (formType === 'Socialstatus') {
+                    window.location.href = '/SocialStatusForms/Index';  // Redirect to Training Request form page
                 }
             });
 

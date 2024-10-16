@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,13 +16,12 @@ namespace OfficePortal.Controllers.Admin_Controllers
     public class EventModelsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private LanguageService _localization;
+        private readonly LanguageService _localization;
 
         public EventModelsController(ApplicationDbContext context, LanguageService localization)
         {
             _context = context;
             _localization = localization;
-
         }
 
         // GET: EventModels
@@ -63,16 +63,15 @@ namespace OfficePortal.Controllers.Admin_Controllers
 
         //GET: EventModels/Create
         [HttpGet("Create")]
+
+        [Authorize(Policy = "AdminPolicy")]
         public ActionResult Create()
         {
             return PartialView("_CreateEvent", new EventModel());
         }
 
-        // POST: EventModels/Create//
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("Create")]
-        //[ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult Create([FromBody] EventModel model)
         {
             if (ModelState.IsValid)
@@ -80,7 +79,7 @@ namespace OfficePortal.Controllers.Admin_Controllers
                 _context.Add(model);
                 _context.SaveChanges();
                 //return RedirectToAction(nameof(Index));
-                return Json(new { success = true, message = "Event created successfully!"/*, events = RedirectToAction("Detail", new { id = model.Id })*/ });
+                return Json(new { success = true, message = _localization.Getkey("Eventcreatedsuccessfully").Value });
             }
             return Json(new { success = false, message = "Failed to create event." });
             //return View(Model);
@@ -158,6 +157,9 @@ namespace OfficePortal.Controllers.Admin_Controllers
             return View(eventModel);
         }
         // EventModelsController.cs
+        
+        
+        [Authorize(Policy = "AdminEmployeePolicy")]
 
         [HttpGet]
         public JsonResult GetEvents()
@@ -166,7 +168,7 @@ namespace OfficePortal.Controllers.Admin_Controllers
             var events = _context.EventModel.Select(e => new
             {
                 id = e.Id,
-                title = e.Title,
+                title = $"{e.Title} - {e.Label}",
                 start = e.StartDate.HasValue ? e.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null, // Format for FullCalendar
                 end = e.EndDate.HasValue ? e.EndDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null,     // Format for FullCalendar
                 description = e.Description,

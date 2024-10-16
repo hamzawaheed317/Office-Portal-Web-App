@@ -1,9 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficePortal.Data;
 using OfficePortal.Models;
+using OfficePortal.Models.Account_Models;
+using OfficePortal.Models.Admin_Models;
+using OfficePortal.Models.Admin_Models.Announcement_Models;
 using OfficePortal.Models.Employee_Models;
 using OfficePortal.Services;
+using WebApplication1.Services;
 
 namespace OfficePortal.Controllers.Admin_Controllers
 {
@@ -11,22 +16,38 @@ namespace OfficePortal.Controllers.Admin_Controllers
     {
         private readonly ApplicationDbContext _context;
         private LanguageService _localization;
+        private readonly IActiveDirectoryService _activeDirectoryService;
+        private UserInfo _userInfo;
 
-        public AdminDashboard(ApplicationDbContext context, LanguageService localization)
+        public AdminDashboard(ApplicationDbContext context, LanguageService localization, IActiveDirectoryService activeDirectoryService)
         {
             _context = context;
 
             _localization = localization;
 
+            _activeDirectoryService = activeDirectoryService;
+
+
+            _userInfo = _activeDirectoryService.GetUserInfo();
+
         }
+
+        [Authorize(Policy = "AdminPolicy")]
+
         public async Task<IActionResult> HomeAdmin()
         {
             return View(await _context.Announcement.ToListAsync());
         }
-        public IActionResult Home()
+        public async Task<IActionResult> Home()
         {
-            return View("HomeAdmin");
+            var viewModel = await GetAdminDataAsync();
+
+            return View("HomeAdmin", viewModel);
         }
+
+
+        [Authorize(Policy = "AdminPolicy")]
+
 
         public async Task<IActionResult> FormRequestAdminPage()
         {
@@ -58,6 +79,9 @@ namespace OfficePortal.Controllers.Admin_Controllers
 
             return View(result);
         }
+
+        [Authorize(Policy = "AdminPolicy")]
+
         public async Task<IActionResult> IndexPageTrainingRequestViewModels(int? id)
         {
             if (id == null)
@@ -76,6 +100,9 @@ namespace OfficePortal.Controllers.Admin_Controllers
             // Return a partial view instead of a full view
             return PartialView("_TrainingRequestDetails", trainingRequestViewModel);
         }
+
+        [Authorize(Policy = "AdminPolicy")]
+
         public async Task<IActionResult> MissionandTrainingForm(int id)
         {
             if (id <= 0) // Changed the check to ensure id is valid
@@ -93,6 +120,9 @@ namespace OfficePortal.Controllers.Admin_Controllers
 
             return PartialView("MissionandTrainingForm", missionandTrainingForm);
         }
+
+        [Authorize(Policy = "AdminPolicy")]
+
         [HttpPost]
         public async Task<IActionResult> UpdateFormStatus(int id, string formType, string status)
         {
@@ -155,5 +185,111 @@ namespace OfficePortal.Controllers.Admin_Controllers
             }
         }
 
+        [Authorize(Policy = "AdminPolicy")]
+
+        private async Task<AdminViewModel> GetAdminDataAsync()
+        {
+            var viewModel = new AdminViewModel();
+
+            // Get all announcements
+            viewModel.announcements = await _context.Announcement.ToListAsync();
+
+            // Count pending form requests from the two form tables
+            viewModel.form_requests_count = await _context.TrainingRequestViewModel
+                .Where(f => f.status == "Pending...") // Adjust the status name as needed
+                .CountAsync() +
+                await _context.MissionandTrainingForm // Replace with your actual DbSet name
+                .Where(f => f.status == "Pending...")
+                .CountAsync();
+
+            // Count pending comments
+            viewModel.comment_requests_count = await _context.Comment
+                .Where(c => c.status == "Pending...") // Adjust the status name as needed
+                .CountAsync();
+
+            // Assuming you have a separate count for initiatives if needed
+            viewModel.initative_requests_count = 20;
+
+            return viewModel;
+        }
+
+        [Authorize(Policy = "AdminPolicy")]
+
+        public IActionResult GetPendingComments()
+        {
+            var pendingComments = _context.Comment
+                .Where(c => c.status == "Pending...")
+                .ToList();
+
+            return View("GetPendingComments", pendingComments);
+        }
+       
+        [Authorize(Policy = "AdminPolicy")]
+
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCommentStatus(int id, string newStatus)
+        {
+            var comment = await _context.Comment.FindAsync(id);
+            if (comment != null)
+            {
+                comment.status = newStatus; // Update the status
+                await _context.SaveChangesAsync(); // Save changes to the database
+
+                return Json(new { success = true }); // Return a success response
+            }
+
+            return Json(new { success = false, message = "Comment not found." }); // Return a failure response
+        }
+
+        [Authorize(Policy = "AdminPolicy")]
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(AdminViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.announcement.Content))
+            {
+                return Json(new { success = false, message = "Content should not be null." });
+            }
+
+            string fileUrl = null;
+            if (model.announcement.FileUrl != null && model.announcement.FileUrl.Length > 0)
+            {
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".mp4" };
+                var extension = Path.GetExtension(model.announcement.FileUrl.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    return Json(new { success = false, message = "Only image files (.jpg, .png) or video files (.mp4) are allowed." });
+                }
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                fileUrl = Path.Combine(uploadsFolder, model.announcement.FileUrl.FileName);
+
+                using (var stream = new FileStream(fileUrl, FileMode.Create))
+                {
+                    await model.announcement.FileUrl.CopyToAsync(stream);
+                }
+            }
+
+            var announcement = new Announcement
+            {
+                Content = model.announcement.Content,
+                Author = _userInfo.Employee_Name,
+                PostedDate = DateTime.Now,
+                IsPinned = false,
+                LikesCount = 0,
+                FileUrl = model.announcement.FileUrl?.FileName
+            };
+
+            _context.Announcement.Add(announcement);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Announcement created successfully!" });
+        }
     }
+
+
 }

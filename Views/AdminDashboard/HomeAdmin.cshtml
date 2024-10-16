@@ -1,4 +1,4 @@
-﻿@model IEnumerable<OfficePortal.Models.Admin_Models.Announcement_Models.Announcement>
+﻿@model OfficePortal.Models.Admin_Models.AdminViewModel
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,137 +7,201 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
 
-    <!-- Bootstrap CSS for layout and styling -->
+    <!-- Bootstrap CSS for responsive layout and styling -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-    <!-- Custom CSS Styles -->
+    <!-- Custom CSS for tailored styles -->
     <style>
+        body {
+            padding: 20px;
+        }
+
         .add-announcement-container {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: flex-end;
         }
 
         .announcements-container {
-            max-width: 900px;
-            margin: 0 auto;
+            max-width: 600px; /* Reduced width */
+            margin-left: 20px; /* Slightly left aligned for better aesthetics */
+            overflow-y: auto; /* Enables scrollable content if necessary */
+            max-height: 400px; /* Reduced height */
+            border: 1px solid #dee2e6; /* Optional: Add border for better visibility */
+            border-radius: 8px; /* Optional: Rounded corners */
+            padding: 10px; /* Reduced padding for a more compact look */
+            background-color: #f8f9fa; /* Optional: Light background color */
         }
 
         .announcement-card {
-            background-color: #f9f9f9;
+            background-color: #ffffff; /* Card background */
             border-radius: 8px;
-            padding: 20px;
+            padding: 10px; /* Reduced padding */
+            margin-bottom: 10px; /* Reduced margin */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            width: 100%; /* Make card fill the container */
+        }
+
+        .request-counts {
+            display: flex;
+            justify-content: space-around;
             margin-bottom: 20px;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .announcement-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .author-info {
-            display: flex;
-            align-items: center;
-        }
-
-        .author-profile {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .author-name {
-            font-weight: bold;
-        }
-
-        .posted-date {
-            margin-left: 10px;
-            color: #777;
-        }
-
-        .announcement-content {
-            margin-top: 15px;
-        }
-
-        .announcement-image,
-        .announcement-video {
-            width: 100%;
+        .request-card {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #007bff;
             border-radius: 8px;
-            margin-top: 15px;
-            object-fit: cover;
+            width: 30%;
         }
 
-        .announcement-footer {
-            margin-top: 15px;
+            .request-card a {
+                text-decoration: none; /* Remove underline for cleaner look */
+                color: inherit; /* Inherit text color */
+            }
+
+            .request-card:hover {
+                cursor: pointer;
+                background-color: #e9ecef; /* Light background on hover */
+            }
+
+        .like-comment-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .like-comment-section {
-            display: flex;
-            align-items: center;
-        }
-
-        .like-count {
-            margin-right: 20px;
-        }
-
-        .heart-icon {
-            font-size: 25px; /* Increased size */
-            cursor: pointer;
-            color: #e74c3c;
-            margin-right: 10px; /* Added margin */
-        }
-
-            .heart-icon.liked {
-                color: #c0392b;
-            }
-
-        .view-comments {
-            margin-right: 20px; /* Added margin */
-            color: #007bff;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
         .add-comment-section {
             display: flex;
-            flex: 1;
+            margin-top: 10px; /* Space between sections */
         }
 
         .comment-input {
-            flex-grow: 1;
-            margin-right: 10px;
+            flex: 1;
+            margin-right: 10px; /* Space between input and button */
         }
 
-        .post-comment-btn {
-            margin-left: 10px; /* Added margin */
+        .announcement-footer {
+            margin-top: 10px; /* Reduced margin for footer */
         }
 
-        .comments-section {
-            margin-top: 15px;
-            display: none;
+        /* Additional media styles */
+        .announcement-image {
+            width: 100%; /* Makes the image responsive */
+            height: auto; /* Maintains aspect ratio */
+            max-height: 200px; /* Restricts height for uniformity */
+            object-fit: cover; /* Ensures image covers area without distortion */
+            border-radius: 5px; /* Slight rounding for aesthetics */
+            margin-top: 10px; /* Spacing above the image */
+        }
+
+        .announcement-video {
+            width: 100%; /* Makes the video responsive */
+            height: auto; /* Maintains aspect ratio */
+            max-height: 200px; /* Restricts height for uniformity */
+            border-radius: 5px; /* Slight rounding for aesthetics */
+            margin-top: 10px; /* Spacing above the video */
+        }
+
+        .see-all-announcements {
+            margin-top: 20px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <!-- Add Announcement Button -->
-    <div class="add-announcement-container">
-        <p>
-            <a asp-action="Create" class="btn btn-primary">Create New</a>
-        </p>
+    <!-- Request Counts Section -->
+    <div class="request-counts">
+        <div class="request-card">
+            <a asp-action="FormRequestAdminPage" asp-controller="AdminDashboard">
+                <h4>Form Requests</h4>
+                <p class="count">@Model.form_requests_count</p>
+            </a>
+        </div>
+        <div class="request-card">
+            <a asp-action="GetPendingComments" asp-controller="AdminDashboard">
+                <h4>Comment Requests</h4>
+                <p class="count">@Model.comment_requests_count</p>
+            </a>
+        </div>
+        <div class="request-card">
+            <a asp-action="InitiativeRequests" asp-controller="Announcements">
+                <h4>Initiative Requests</h4>
+                <p class="count">@Model.initative_requests_count</p>
+            </a>
+        </div>
     </div>
 
+    <!-- Add Announcement Form -->
+    <h4>Create Announcement</h4>
+    <div class="add-announcement-container">
+        <form id="announcementForm" asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="announcement.Content" class="control-label"></label>
+                <input asp-for="announcement.Content" class="form-control" />
+                <span asp-validation-for="announcement.Content" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="announcement.FileUrl" class="control-label"></label>
+                <input type="file" asp-for="announcement.FileUrl" class="form-control" />
+                <span asp-validation-for="announcement.FileUrl" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#announcementForm').submit(function (e) {
+                e.preventDefault(); 
+
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: '@Url.Action("Create", "AdminDashboard")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            alert("Success: " + response.message);
+                            $('#announcementForm')[0].reset(); 
+                        } else {
+                            alert("Error: " + response.message);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("An unexpected error occurred: " + textStatus + " - " + errorThrown);
+                        console.error("Error details:", jqXHR.responseText); // Log response for debugging
+                    }
+                });
+            });
+        });
+
+    </script>
+
+    <!-- Add Bootstrap JavaScript for dismissing the alert -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     <!-- Announcements List -->
+    <div class="panel">
+        <div class="see-all-announcements">
+            <a asp-action="Index" asp-controller="Announcements">See All Announcements</a>
+        </div>
+        <h2>Announcements</h2>
+    </div>
     <div class="announcements-container">
-        @foreach (var announcement in Model)
-
-
-
+        @foreach (var announcement in Model.announcements)
         {
             <div class="announcement-card">
                 <div class="announcement-header">
@@ -151,26 +215,14 @@
                 <div class="announcement-content">
                     <p>@announcement.Content</p>
 
-                    <!-- Display image or video based on file type -->
+                    <!-- Display media based on file type -->
                     @if (!string.IsNullOrEmpty(announcement.FileUrl))
                     {
-
-
-
-                        if (announcement.FileUrl.EndsWith(".jpg") || announcement.FileUrl.EndsWith(".png"))
-
-
-
+                        if (announcement.FileUrl.EndsWith(".jpg") || announcement.FileUrl.EndsWith(".png") || announcement.FileUrl.EndsWith(".jpeg"))
                         {
                             <img src="@Url.Content("~/uploads/" + announcement.FileUrl)" alt="Announcement Image" class="announcement-image" />
                         }
-
-
-
                         else if (announcement.FileUrl.EndsWith(".mp4"))
-
-
-
                         {
                             <video controls class="announcement-video">
                                 <source src="@Url.Content("~/uploads/" + announcement.FileUrl)" type="video/mp4">
@@ -185,7 +237,7 @@
                     <div class="like-comment-section">
                         <span class="like-count">@announcement.LikesCount Likes</span>
                         <a href="#" class="like-btn" data-announcement-id="@announcement.Id">
-                            <i class="heart-icon">&#9829;</i>
+                            <i class="heart-icon">&#9829;</i> <!-- Heart icon for liking -->
                         </a>
                         <a href="#" class="view-comments" data-announcement-id="@announcement.Id">View Comments</a>
                     </div>
@@ -196,7 +248,7 @@
                     </div>
                 </div>
 
-                <!-- Hidden comments section, will be shown when clicked -->
+                <!-- Hidden comments section; revealed upon interaction -->
                 <div class="comments-section" id="comments-@announcement.Id">
                     <!-- Comments will be loaded via Ajax -->
                 </div>
@@ -204,11 +256,12 @@
         }
     </div>
 
-    <!-- jQuery Script for interactivity -->
+    <!-- jQuery for interactivity -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            // Toggle comment section visibility
+            // Toggle comment visibility
             $('.view-comments').on('click', function (e) {
                 e.preventDefault();
                 const announcementId = $(this).data('announcement-id');
@@ -217,7 +270,7 @@
                 commentsSection.toggle();
 
                 if (commentsSection.is(':visible')) {
-                    // Load comments via Ajax if comments section is visible
+                    // Load comments via Ajax if section is visible
                     const loadCommentsUrl = '@Url.Action("GetComments", "Announcements")';
                     $.get(loadCommentsUrl, { announcementId: announcementId }, function (data) {
                         commentsSection.html(data);
@@ -227,18 +280,18 @@
                 }
             });
 
-            // Post a comment
+            // Handle posting a comment
             $('.post-comment-btn').on('click', function () {
                 const announcementId = $(this).data('announcement-id');
                 const commentInput = $(this).closest('.add-comment-section').find('.comment-input');
                 const commentText = commentInput.val().trim();
 
-                if (!commentText) return; // Exit if comment is empty
+                if (!commentText) return; // Exit if input is empty
 
                 const commentData = {
                     AnnouncementId: announcementId,
                     Content: commentText,
-                    Author: 'hw' // Static author name
+                    Author: 'hw' // Static author name for demo purposes
                 };
 
                 const postCommentUrl = '@Url.Action("Post_Comment", "Announcements")';
@@ -251,20 +304,18 @@
                         if (response.success) {
                             alert(response.message);
 
-                            // Clear the comment input field
+                            // Clear comment input
                             commentInput.val('');
 
-                            // Reload comments to show the new comment
-                            const commentsSection = $('#comments-' + announcementId);
-                            const loadCommentsUrl = '@Url.Action("GetComments", "Announcements")';
-                            $.get(loadCommentsUrl, { announcementId: announcementId }, function (data) {
-                                commentsSection.html(data);
-                            }).fail(function () {
-                                console.error("Failed to load comments.");
-                            });
+                            // Optionally refresh comments section
+                            $('#comments-' + announcementId).append('<div>' + commentText + '</div>');
+
+
+                            location.reload();
+
 
                         } else {
-                            alert(response.message);
+                            alert("Failed to post comment.");
                         }
                     },
                     error: function () {
@@ -272,28 +323,22 @@
                     }
                 });
             });
+        });
 
-            // Like an announcement
-            $('.like-btn').on('click', function (e) {
-                e.preventDefault();
-                const announcementId = $(this).data('announcement-id');
-                const likeUrl = '@Url.Action("Like", "Announcements")';
-                const likeButton = $(this);
+            $(document).ready(function () {
+                $('input[type="file"]').on('change', function () {
+                    var fileInput = $(this);
+                    var filePath = fileInput.val();
+                    var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.mp4)$/i;
 
-                $.post(likeUrl, { announcementId: announcementId }, function (response) {
-                    if (response.success) {
-                        let likeCountElem = likeButton.closest('.like-comment-section').find('.like-count');
-                        let likeCount = parseInt(likeCountElem.text()) || 0;
-                        likeCountElem.text((likeCount + 1) + ' Likes');
-                        likeButton.find('.heart-icon').addClass('liked');
-                    } else {
-                        alert(response.message);
+                    if (!allowedExtensions.exec(filePath)) {
+                        alert("Only image files (.jpg, .png) or video files (.mp4) are allowed.");
+                        fileInput.val(''); 
+                        return false;
                     }
-                }).fail(function () {
-                    console.error("Error liking announcement.");
                 });
             });
-        });
+
     </script>
 </body>
 </html>

@@ -124,9 +124,8 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+               
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
 
     <script>
         $(document).ready(function () {
@@ -167,7 +166,11 @@
                     var dateFrom = new Date(dateFromStr);
                     var dateTo = new Date(dateToStr);
 
-                    if (dateFrom > dateTo) {
+                    // Adjust date parsing according to your format (MM/DD/YYYY HH:mm:ss AM/PM)
+                    if (isNaN(dateFrom.getTime()) || isNaN(dateTo.getTime())) {
+                        $('#DateFrom').next('.text-danger').text('@_localization.Getkey("ErrorInvalidDateFormat")');
+                        valid = false;
+                    } else if (dateFrom > dateTo) {
                         $('#DateFrom').next('.text-danger').text('@_localization.Getkey("ErrorEndDateBeforeStartDate")');
                         valid = false;
                     }
@@ -199,3 +202,4 @@
         });
     </script>
 }
+

@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
+    <title>>@_localization.Getkey("AnnouncementsTitle")</title>
 
     <!-- Bootstrap CSS for layout and styling -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -125,14 +125,7 @@
     </style>
 </head>
 <body>
-    <!-- Add Announcement Button -->
-    <div class="add-announcement-container">
-        <p>
-            <a asp-action="Create" class="btn btn-primary">Create New</a>
-        </p>
-    </div>
-
-    <!-- Announcements List -->
+      <!-- Announcements List -->
     <div class="announcements-container">
         @foreach (var announcement in Model)
 
@@ -153,7 +146,7 @@
                     @if (!string.IsNullOrEmpty(announcement.FileUrl))
                     {
 
-                        if (announcement.FileUrl.EndsWith(".jpg") || announcement.FileUrl.EndsWith(".png"))
+                        if (announcement.FileUrl.EndsWith(".jpg") || announcement.FileUrl.EndsWith(".png") || announcement.FileUrl.EndsWith(".jpeg"))
 
                         {
                             <img src="@Url.Content("~/uploads/" + announcement.FileUrl)" alt="Announcement Image" class="announcement-image" />
@@ -173,16 +166,16 @@
                 <!-- Footer with like and comment functionality -->
                 <div class="announcement-footer">
                     <div class="like-comment-section">
-                        <span class="like-count">@announcement.LikesCount Likes</span>
+                        <span class="like-count">@announcement.LikesCount  @_localization.Getkey("Likes")</span>
                         <a href="#" class="like-btn" data-announcement-id="@announcement.Id">
                             <i class="heart-icon">&#9829;</i>
                         </a>
-                        <a href="#" class="view-comments" data-announcement-id="@announcement.Id">View Comments</a>
+                        <a href="#" class="view-comments" data-announcement-id="@announcement.Id">@_localization.Getkey("ViewComments")</a>
                     </div>
 
                     <div class="add-comment-section">
-                        <input type="text" class="form-control comment-input" placeholder="Add a comment" data-announcement-id="@announcement.Id" />
-                        <button class="btn btn-primary post-comment-btn" data-announcement-id="@announcement.Id">Post</button>
+                        <input type="text" class="form-control comment-input" placeholder="@_localization.Getkey("AddCommentPlaceholder")" data-announcement-id="@announcement.Id" />
+                        <button class="btn btn-primary post-comment-btn" data-announcement-id="@announcement.Id">@_localization.Getkey("Post")</button>
                     </div>
                 </div>
 
@@ -223,12 +216,13 @@
                 const commentInput = $(this).closest('.add-comment-section').find('.comment-input');
                 const commentText = commentInput.val().trim();
 
-                if (!commentText) return; // Exit if comment is empty
+                if (!commentText) return; 
 
                 const commentData = {
                     AnnouncementId: announcementId,
                     Content: commentText,
-                    Author: 'hw' // Static author name
+                    Author: 'Adam',
+                    status: 'Pending...'
                 };
 
                 const postCommentUrl = '@Url.Action("Post_Comment", "Announcements")';

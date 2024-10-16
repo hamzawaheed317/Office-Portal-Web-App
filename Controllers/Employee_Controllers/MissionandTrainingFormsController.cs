@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficePortal.Data;
 using OfficePortal.Models.Account_Models;
 using OfficePortal.Models.Employee_Models;
+using WebApplication1.Services;
 
 namespace OfficePortal.Controllers.Employee_Controllers
 {
@@ -15,10 +16,15 @@ namespace OfficePortal.Controllers.Employee_Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
-        public MissionandTrainingFormsController(ApplicationDbContext context, IEmailService emailService)
+        private readonly IActiveDirectoryService _activeDirectoryService;
+
+        private UserInfo _userInfo;
+        public MissionandTrainingFormsController(ApplicationDbContext context, IEmailService emailService, IActiveDirectoryService activeDirectoryService)
         {
             _context = context;
             _emailService = emailService;
+            _activeDirectoryService = activeDirectoryService;
+            _userInfo = _activeDirectoryService.GetUserInfo();
         }
 
         // GET: MissionandTrainingForms
@@ -42,19 +48,17 @@ namespace OfficePortal.Controllers.Employee_Controllers
         // GET: MissionandTrainingForms/Create
         public IActionResult Create()
         {
-            UserInfo userInfo = GetUserInfo(); // Replace this with actual fetching logic
 
             MissionandTrainingForm model = new MissionandTrainingForm
             {
-                EmployeeName = userInfo.Employee_Name,
-                JobTitle = userInfo.Job_Title,
-                Grade = userInfo.Grade,
-                Number = userInfo.Employee_Number.ToString(),
-                Department = userInfo.Department,
-                LineManager = userInfo.role
+                EmployeeName = _userInfo.Employee_Name,
+                JobTitle = _userInfo.Job_Title,
+                Grade = _userInfo.Grade,
+                Number = _userInfo.Employee_Number.ToString(),
+                Department = _userInfo.Department,
+                LineManager = _userInfo.role
             };
 
-            // Assuming this method populates all the necessary employee details into the model
             return PartialView("_MissionTrainingFormPartial", model); // Return the partial view with the model
         }
 
@@ -75,30 +79,17 @@ namespace OfficePortal.Controllers.Employee_Controllers
                 string subject = "New Mission and Training Form Submitted";
                 string messageText = $"A new mission and training form has been submitted.\n\n" +
                                      $"Details:\n" +
-                                     $"Name: {missionandTrainingForm.Departure_date}\n" +
-                                     $"Date: {missionandTrainingForm.Departure_time}\n" +
+                                     $"Name: {missionandTrainingForm.EmployeeName}\n" +
+                                     $"Date: {missionandTrainingForm.date_from}\n" +
                                      $"Description: {missionandTrainingForm.Purpose}\n";
 
-                // Send email
-                await _emailService.SendEmailAsync("hasanmughal538@gmail.com", subject, messageText);
+                await _emailService.SendEmailAsync(_userInfo.Admin_email, subject, messageText);
 
-                // Redirect to the index page after saving and sending the email
                 return RedirectToAction(nameof(Index));
             }
             return View(missionandTrainingForm);
         }
-        private UserInfo GetUserInfo()
-        {
-            return new UserInfo
-            {
-                Employee_Name = "John Doe",
-                Job_Title = "Software Engineer",
-                Grade = "A1",
-                Employee_Number = "12345",
-                Department = "IT",
-                role = "Line Manager"
-            };
-        }
+       
 
         // GET: MissionandTrainingForms/Edit/5
         public async Task<IActionResult> Edit(int? id)
