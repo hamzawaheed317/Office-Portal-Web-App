@@ -257,27 +257,9 @@
                 });
             });
 
-            // Like an announcement
-            $('.like-btn').on('click', function (e) {
-                e.preventDefault();
-                const announcementId = $(this).data('announcement-id');
-                const likeUrl = '@Url.Action("Like", "Announcements")';
-                const likeButton = $(this);
-
-                $.post(likeUrl, { announcementId: announcementId }, function (response) {
-                    if (response.success) {
-                        let likeCountElem = likeButton.closest('.like-comment-section').find('.like-count');
-                        let likeCount = parseInt(likeCountElem.text()) || 0;
-                        likeCountElem.text((likeCount + 1) + ' Likes');
-                        likeButton.find('.heart-icon').addClass('liked');
-                    } else {
-                        alert(response.message);
-                    }
-                }).fail(function () {
-                    console.error("Error liking announcement.");
-                });
-            });
         });
+
+
     </script>
 </body>
 </html>

@@ -1,0 +1,19 @@
+﻿@model IEnumerable<OfficePortal.Models.Reply_Comment_Model>
+
+<div class="reply-list">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var reply in Model)
+        {
+            <div class="reply-item">
+                <p><strong>@reply.Author</strong> (@reply.PostedDate.ToString("MM/dd/yyyy HH:mm"))</p>
+                <p>@reply.Content</p>
+                <hr />
+            </div>
+        }
+    }
+    else
+    {
+        <p>No replies available.</p>
+    }
+</div>

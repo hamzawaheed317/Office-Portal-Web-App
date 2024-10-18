@@ -47,7 +47,7 @@ namespace OfficePortal.Models.Employee_Models
 
         // File Uploads
         [Required(ErrorMessage = "_localization.Getkey('ErrorUploadedFilesRequired')")]
-        public List<IFormFile> UploadedFiles { get; set; }=new List<IFormFile>();
+        public List<IFormFile> UploadedFiles { get; set; }
 
         public string Form_Type { get; set; }
         public string Status { get; set; }

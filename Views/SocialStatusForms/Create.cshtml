@@ -101,9 +101,9 @@
 
             <!-- File Upload Section -->
             <div class="form-group">
-                <label>Uploaded Files (Max 5 files, total 5MB):</label>
+                <label>Uploaded Files (Max 5 files per type, total 5MB each):</label>
                 <input type="file" id="fileInput" name="UploadedFiles" class="form-control" multiple />
-                <small class="form-text text-muted">Optional. You can add up to 5 files with a total size of 5MB.</small>
+                <small class="form-text text-muted">Optional. You can add up to 5 image and 5 PDF files, with a total size of 5MB each.</small>
                 <ul id="fileList" class="list-unstyled mt-2"></ul>
                 <span class="text-danger" id="fileError"></span>
             </div>
@@ -125,7 +125,7 @@
             const maxTotalSize = 5 * 1024 * 1024; // 5MB
             let totalFileSize = 0;
             let fileList = [];
-            const allowedExtensions = ["jpeg", "jpg", "pdf"]; // Allowed file types
+            const allowedExtensions = ["jpeg", "jpg", "pdf"];
 
             // Function to display files and update total size
             function updateFileList() {
@@ -140,14 +140,14 @@
                 $('#fileError').text(totalFileSize > maxTotalSize ? "Total file size exceeds 5MB." : "");
             }
 
-            // Function to validate file type
+            // Validate file type
             function isFileTypeValid(fileName) {
                 const extension = fileName.split('.').pop().toLowerCase();
                 return allowedExtensions.includes(extension);
             }
 
             // Handle file selection
-            $('input[type="file"]').on('change', function () {
+            $('#fileInput').on('change', function () {
                 const newFiles = Array.from(this.files);
                 let isValid = true;
 
@@ -160,9 +160,9 @@
 
                 newFiles.forEach(file => {
                     if (!isFileTypeValid(file.name)) {
-                        $('#fileError').text(`Invalid file type: ${file.name}. Only jpeg, jpg, and pdf are allowed.`);
+                        $('#fileError').text(`Invalid file type: ${file.name}. Only JPEG, JPG, and PDF are allowed.`);
                         isValid = false;
-                        return false; // Stop further checks
+                        return false;
                     }
                     if (totalFileSize + file.size <= maxTotalSize) {
                         fileList.push(file);

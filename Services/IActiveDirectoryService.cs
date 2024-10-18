@@ -68,7 +68,7 @@ namespace WebApplication1.Services
                 Employee_Number = "12345", // Ensure Employee_Number is a string if necessary
                 role = "Line Manager",
                 Admin_email = "hasanmughal538@gmail.com",
-                USer_role = "Employee",
+                USer_role = "Admin",
                 Attendies = attendees
             };
 

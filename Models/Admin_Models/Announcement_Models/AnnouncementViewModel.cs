@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OfficePortal.Models.Admin_Models.Announcement_Models
 {
@@ -15,5 +16,7 @@ namespace OfficePortal.Models.Admin_Models.Announcement_Models
         [Required]
         [Display(Name = "Upload File")]
         public IFormFile FileUrl { get; set; }
+
+       
     }
 }

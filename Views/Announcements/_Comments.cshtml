@@ -1,19 +1,161 @@
 ﻿@model IEnumerable<OfficePortal.Models.Comment>
 
-<div id="comments-list">
-    @if (Model != null && Model.Any())
-    {
-        foreach (var comment in Model)
-        {
-            <div class="comment-item">
-                <p><strong>@comment.Author</strong> (@comment.PostedDate.ToString("MM/dd/yyyy"))</p>
-                <p>@comment.Content</p>
-                <hr />
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@_localization.Getkey("CommentsTitle")</title>
+
+    <!-- Bootstrap CSS for layout and styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        .comment-item {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
         }
-    }
-    else
-    {
-        <p>No comments available.</p>
-    }
-</div>
+
+        .add-reply-section {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .reply-list {
+            margin-top: 10px; /* Space above replies */
+            margin-bottom: 20px; /* Space below replies */
+            padding-left: 20px; /* Optional: Indentation for replies */
+            border-left: 2px solid #007bff; /* Optional: Left border for better distinction */
+            padding: 10px; /* Padding inside the replies list */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="comments-list">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var comment in Model)
+            {
+                <div class="comment-item">
+                    <p><strong>@comment.Author</strong> (@comment.PostedDate.ToString("MM/dd/yyyy"))</p>
+                    <p>@comment.Content</p>
+
+                    <!-- Reply Button -->
+                    <a href="#" class="reply-btn" data-comment-id="@comment.Id">Reply</a>
+
+                    <!-- Hidden reply section, shown when "Reply" is clicked -->
+                    <div class="add-reply-section" id="reply-section-@comment.Id" style="display: none;">
+                      
+                        <form asp-action="Create" asp-controller="Announcements" method="post">
+                            <div class="form-group">
+                                <label for="reply-input-@comment.Id">Your Reply:</label>
+                                <input type="text" name="Content" class="form-control" placeholder="Add a reply..." required />
+                            </div>
+
+                            <!-- Hidden Fields for Reply -->
+                            <input type="hidden" name="AnnouncementId" value="@comment.AnnouncementId" />
+                            <input type="hidden" name="Comment_Id" value="@comment.Id" />
+                            <input type="hidden" name="PostedDate" value="@DateTime.Now" />
+                            <input type="hidden" name="Status" value="Pending..." />
+                            <input type="hidden" name="Author" value="" /> <!-- Assuming author is current logged-in user -->
+
+                            <button type="submit" class="btn btn-primary">Post Reply</button>
+                        </form>
+                    </div>
+
+                    <!-- See Replies Button -->
+                    <a href="#" class="see-replies-btn" data-comment-id="@comment.Id">See Replies</a>
+
+                    <!-- Replies List -->
+                    <div class="reply-list" id="reply-list-@comment.Id" style="display: none;"></div>
+
+                    <hr />
+                </div>
+            }
+        }
+        else
+        {
+            <p>No comments available.</p>
+        }
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Toggle reply input on clicking "Reply"
+            $('.reply-btn').on('click', function (e) {
+                e.preventDefault();
+                var commentId = $(this).data('comment-id');
+                $('#reply-section-' + commentId).toggle();
+            });
+
+            // Fetch replies on clicking "See Replies"
+            $('.see-replies-btn').on('click', function (e) {
+                e.preventDefault();
+                var commentId = $(this).data('comment-id');
+                var replyListDiv = $('#reply-list-' + commentId);
+
+                // Toggle visibility of reply list
+                replyListDiv.toggle();
+
+                // If replies are shown, fetch them
+                if (replyListDiv.is(':visible') && replyListDiv.is(':empty')) {
+                    $.ajax({
+                        url: '/Announcements/GetReplies', // Adjust the URL according to your routing
+                        type: 'GET',
+                        data: { commentId: commentId },
+                        success: function (data) {
+                            replyListDiv.html(data);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error fetching replies:", error);
+                        }
+                    });
+                }
+            });
+
+            // Handle reply form submission using AJAX
+            $('form').on('submit', function (e) {
+                e.preventDefault(); // Prevent normal form submission
+
+                var form = $(this); // Get the form element
+                var formData = form.serialize(); // Serialize the form data
+                var commentId = form.find('input[name="Comment_Id"]').val(); // Get comment ID for updating the UI
+
+                $.ajax({
+                    url: form.attr('action'), // Use the form action (it should point to your Create method)
+                    type: form.attr('method'), // Use the form method (POST)
+                    data: formData,
+                    success: function (response) {
+                        // Show success alert
+                        alert('Reply successfully posted!');
+                        // Optionally, clear the form input
+                        form.find('input[name="Content"]').val('');
+
+                        // Optionally, reload the replies to show the new one
+                        $('#reply-list-' + commentId).toggle().empty(); // Hide and clear the current list
+                        $.ajax({
+                            url: '/Announcements/GetReplies',
+                            type: 'GET',
+                            data: { commentId: commentId },
+                            success: function (data) {
+                                $('#reply-list-' + commentId).html(data).show(); // Reload replies
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        // Show error alert
+                        alert('Failed to post reply. Please try again.');
+                        console.error("Error creating reply:", error);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

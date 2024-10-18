@@ -43,6 +43,18 @@ namespace OfficePortal.Controllers
             return View(reply_Comment_Model);
         }
 
+        public async Task<IActionResult> GetReplies(int commentId)
+        {
+            var replies = await _context.Reply_Comment_Model
+           .Where(r => r.Comment_Id == commentId)
+           .OrderByDescending(r => r.PostedDate)
+           .ToListAsync();
+
+            // Return the partial view with the list of replies
+            return PartialView("_ReplyPartial", replies);
+        }
+
+
         // GET: Reply_Comment_Model/Create
         public IActionResult Create()
         {
@@ -54,7 +66,7 @@ namespace OfficePortal.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Author,Content,PostedDate,status,AnnouncementId,Comment_Id")] Reply_Comment_Model reply_Comment_Model)
+        public async Task<IActionResult> Create(Reply_Comment_Model reply_Comment_Model)
         {
             if (ModelState.IsValid)
             {

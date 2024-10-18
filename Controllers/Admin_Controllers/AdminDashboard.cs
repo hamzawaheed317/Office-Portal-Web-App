@@ -217,13 +217,29 @@ namespace OfficePortal.Controllers.Admin_Controllers
 
         public IActionResult GetPendingComments()
         {
+            // Fetch all pending comments
             var pendingComments = _context.Comment
                 .Where(c => c.status == "Pending...")
                 .ToList();
 
-            return View("GetPendingComments", pendingComments);
+            // Fetch all pending replies
+            var pendingReplies = _context.Reply_Comment_Model
+                .Where(r => r.status == "Pending...")
+                .OrderByDescending(r => r.PostedDate)
+                .ToList();
+
+            // Combine the comments with their corresponding replies based on status
+            var pendingCommentsWithReplies = pendingComments.Select(c => new CommentViewModel
+            {
+                Comment = c,
+                Replies = pendingReplies // Include all pending replies
+            }).ToList();
+
+            return View("GetPendingComments", pendingCommentsWithReplies);
         }
-       
+
+
+
         [Authorize(Policy = "AdminPolicy")]
 
 

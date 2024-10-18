@@ -74,6 +74,7 @@ namespace OfficePortal.Controllers.Admin_Controllers
 
         [Authorize(Policy = "AdminEmployeePolicy")]
         [HttpPost]
+
         public IActionResult Post_Comment([FromBody] Comment comment)
         {
             var newComment = new Comment
@@ -102,9 +103,39 @@ namespace OfficePortal.Controllers.Admin_Controllers
       .ToListAsync();
 
             return PartialView("_Comments", comments);
-        }       
+        }
 
-       
-       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Reply_Comment_Model reply_Comment_Model)
+        {
+            try
+            {
+                reply_Comment_Model.Author = _userInfo.Employee_Name;
+
+                _context.Add(reply_Comment_Model);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Reply Posted successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "An error occurred while posting the reply.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        public async Task<IActionResult> GetReplies(int commentId)
+        {
+            var replies = await _context.Reply_Comment_Model
+        .Where(r => r.Comment_Id == commentId && r.status == "Approved")
+           .OrderByDescending(r => r.PostedDate)
+           .ToListAsync();
+
+            // Return the partial view with the list of replies
+            return PartialView("_ReplyPartial", replies);
+        }
+
     }
 }
